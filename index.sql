@@ -153,7 +153,8 @@ INSERT INTO study_group (teacher_id, language_level_id, name) VALUES
 INSERT INTO student (language_level_id, study_group_id, first_name, last_name, email, password_hash) VALUES
     (1, 4, 'Oleksandr', 'Salah', 'regeln@example.com', '6427435774b539b7eb87924b92d5d417'),
     (2, 1, 'Sofia', 'Hopp', 'sofa@example.com', 'hashed_password'),
-    (3, 4, 'oleg', 'Krivogub', 'oleg.doe@example.com', '6427435774b539b7eb87924b92d5d417');
+    (3, 4, 'oleg', 'Krivogub', 'oleg.doe@example.com', '6427435774b539b7eb87924b92d5d417'),
+    (4, 1, 'Yurii', 'Nagorniak', 'nagorniak@example.com', 'dc647eb65e6711e155375218212b3964');
 
 CALL GenerateTimeSlotData();
 DROP PROCEDURE GenerateTimeSlotData;
