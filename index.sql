@@ -154,6 +154,7 @@ INSERT INTO student (language_level_id, study_group_id, first_name, last_name, e
     (1, 4, 'Oleksandr', 'Salah', 'regeln@example.com', '6427435774b539b7eb87924b92d5d417'),
     (2, 1, 'Sofia', 'Hopp', 'sofa@example.com', 'hashed_password'),
     (3, 4, 'oleg', 'Krivogub', 'oleg.doe@example.com', '6427435774b539b7eb87924b92d5d417'),
+    (3, 1, 'Solomiia', 'Kava', 'solomiia@example.com', 'my_hashed_password'),
     (4, 1, 'Yurii', 'Nagorniak', 'nagorniak@example.com', 'dc647eb65e6711e155375218212b3964');
 
 CALL GenerateTimeSlotData();
