@@ -1,12 +1,17 @@
 import express from "express";
-import { seedDatabase } from "./utils/seedDb.js";
+import { sequelize } from "./models/index.js";
+import teacherRoutes from "./routes/teacherRoutes.js"; 
 
-seedDatabase();
+
+await sequelize.sync({ force: true });
 
 const app = express();
 const port = 4000;
 
 app.use(express.json());
+
+
+app.use("/", teacherRoutes);
 
 app.listen(port, () => {
     console.log(`Server started: port ${port}`);
