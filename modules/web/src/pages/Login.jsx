@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Input from "../components/Input";
+import { NavLink } from "react-router-dom";
+// import Link from "react-router-dom"
 
 function Login() {
     const [checked, setChecked] = useState(false);
@@ -107,15 +109,15 @@ function Login() {
                                 onChange={() => setChecked(!checked)}
                             />
                             <div
-                                className={`w-6 h-6 border-2 rounded-full flex items-center justify-center transition-all ${checked ? "bg-[#36B889] border-[#36B889]" : "border-gray-400"
+                                className={`w-[32px] h-[32px] border-[1px] rounded-full flex items-center justify-center bg-[#36B889] transition-all ${checked ? "bg-[#36B889] border-[#36B889]" : "border-gray-400"
                                     }`}
                             >
-                                {checked && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                                {checked ? <div className="w-[15px] h-[15px] bg-white rounded-full"></div> : <div className="w-[29px] h-[29px] bg-white rounded-full"></div>}
                             </div>
                         </label>
-                        <label htmlFor="checkbox">запамʼятати мене</label>
+                        <label htmlFor="checkbox" className="cursor-pointer">запамʼятати мене</label>
                     </div>
-                    <span>забули пароль?</span>
+                    <NavLink to="/register">забули пароль?</NavLink>
                 </div>
                 <button type="submit" className="mx-auto mt-[44px] w-min flex justify-center align-center text-white text-[20px] bg-[#36B889] rounded-[15px] py-[10px] px-[40.5px]">Увійти</button>
             </form>

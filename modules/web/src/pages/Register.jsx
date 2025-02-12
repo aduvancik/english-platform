@@ -7,9 +7,9 @@ function Register() {
         firstName: "",
         lastName: "",
         email: "",
-        englishLevel: "",
+        englishLevel: [],
         password: "",
-        role: "teacher", // Додаємо роль, за замовчуванням вчитель
+        role: "teacher",
     });
 
     const [errors, setErrors] = useState({});
@@ -108,7 +108,7 @@ function Register() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setIsFormSubmitted(true); // Встановлюємо статус, що форма була надіслана
-        console.log(formData, "la");
+        console.log(formData, "handleSubmit");
 
 
         if (validate()) {
@@ -130,16 +130,62 @@ function Register() {
 
     //функція для вибору рівня англійської
     const handleSelectLevel = (level) => {
-        console.log(level);
-
         const selectedLevel = englishLevels[level];
+
+        if (formData.role === "student") {
+            // For student, allow only one level
+            setFormData({
+                ...formData,
+                englishLevel: [selectedLevel], // Store the level as an array with one value
+            });
+        } else {
+            // For teacher, allow multiple levels
+            setFormData((prevFormData) => {
+                const newLevels = prevFormData.englishLevel.includes(selectedLevel)
+                    ? prevFormData.englishLevel.filter((lvl) => lvl !== selectedLevel) // Remove if already selected
+                    : [...prevFormData.englishLevel, selectedLevel]; // Add the new level
+
+                return {
+                    ...prevFormData,
+                    englishLevel: newLevels,
+                };
+            });
+        }
+
+        if (formData.role === "student") {
+            setIsDropdownOpen(false); // закрити dropdown після вибору рівня
+        }
+    };
+
+
+    const renderSelectedLevels = () => {
+        if (formData.role === "student") {
+            // Display the selected level for students (single selection)
+            return formData.englishLevel.length > 0
+                ? Object.keys(englishLevels).find(key => englishLevels[key] === formData.englishLevel[0])
+                : <span className="text-[#A9A9A9]">Рівень</span>;
+        } else {
+            // Display multiple selected levels for teachers
+            return formData.englishLevel.length > 0
+                ? formData.englishLevel.map((level) => (
+                    <span key={level} className="text-[#A9A9A9] mr-2">
+                        {Object.keys(englishLevels).find(key => englishLevels[key] === level)}
+                    </span>
+                ))
+                : <span className="text-[#A9A9A9]">Рівень</span>;
+        }
+    };
+
+
+
+    const handleRoleChange = (newRole) => {
         setFormData({
             ...formData,
-            englishLevel: selectedLevel !== undefined ? selectedLevel : formData.englishLevel,
+            role: newRole ? "teacher" : "student",
+            englishLevel: []
         });
-        console.log(formData);
+        console.log(formData, "handleRoleChange");
 
-        setIsDropdownOpen(false); // Закриваємо список після вибору
     };
 
 
@@ -151,12 +197,7 @@ function Register() {
                 <ThemeToggle
                     className="mx-auto mt-[45px] mb-[63px]"
                     isTeacher={formData.role === "teacher"} // передаємо статус вчителя/учня
-                    onRoleChange={(newRole) => {
-                        setFormData({
-                            ...formData,
-                            role: newRole ? "teacher" : "student", // Перемикаємо роль на "teacher" або "student"
-                        });
-                    }}
+                    onRoleChange={handleRoleChange}
                 />
                 <div className="pl-[71px] pr-[41px] gap-[25px] flex flex-col">
                     <Input
@@ -201,16 +242,13 @@ function Register() {
                             onClick={toggleDropdown}
                         >
                             <span>
-                                {formData.englishLevel !== ""
-                                    ? Object.keys(englishLevels).find(key => englishLevels[key] === formData.englishLevel)
-                                    : <span className="text-[#A9A9A9]">Рівень</span>}
+                                {renderSelectedLevels()}
                             </span>
 
                             <span className="text-xl">
                                 <svg width="25" height="15" viewBox="0 0 25 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M11.3072 14.4746C11.6385 14.8249 12.0361 15 12.5 15C12.9639 15 13.3615 14.8249 13.6928 14.4746L24.503 3.07356C24.8343 2.72329 25 2.2986 25 1.79947C25 1.30035 24.8343 0.875657 24.503 0.525394C24.1716 0.175131 23.7699 0 23.2977 0C22.8255 0 22.4238 0.175131 22.0924 0.525394L12.5 10.6918L2.90755 0.525394C2.57621 0.175131 2.17445 0 1.70229 0C1.23012 0 0.828363 0.175131 0.497018 0.525394C0.165673 0.875657 0 1.30035 0 1.79947C0 2.2986 0.165673 2.72329 0.497018 3.07356L11.3072 14.4746ZM10.8101 9.64098V13.2137H14.1899V9.64098H10.8101Z" fill={formData.role === "teacher" ? "#5B2BBA" : "#E2379D"} />
                                 </svg>
-
                             </span>
                         </div>
                         {isDropdownOpen && (
@@ -228,6 +266,7 @@ function Register() {
                         )}
                         {isFormSubmitted && errors.englishLevel && <span style={{ color: "red" }}>{errors.englishLevel}</span>}
                     </div>
+
                 </div>
                 <button type="submit" className="mx-auto mt-[44px] w-min flex justify-center align-center text-white text-[20px] bg-[#36B889] rounded-[15px] py-[10px] px-[40.5px]">Зареєструватися</button>
             </form>
