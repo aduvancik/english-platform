@@ -1,9 +1,9 @@
 import express from "express";
-import { sequelize } from "./models/index.js";
+import { seedDatabase } from "./utils/seedDb.js";
+
 import teacherRoutes from "./routes/teacherRoutes.js"; 
 
-
-await sequelize.sync({ force: true });
+seedDatabase();
 
 const app = express();
 const port = 4000;
