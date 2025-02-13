@@ -1,4 +1,4 @@
-import { StudentRequestCard } from "../../shared/layout/StudentRequestCard";
+import { StudentRequestCard } from "../../shared/layout";
 import { LabelledAddUserButton } from "../../shared/ui";
 
 export const StudentRequests = () => {

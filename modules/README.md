@@ -1,8 +1,14 @@
-# React + Vite
+## Крок 1: Встановлення залежностей
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Потрібно встановити залежності:
 
-Currently, two official plugins are available:
+```bash
+npm install
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Крок 2: Запуск проєкту
+Щоб почати розробку, запустіть команду:
+
+npm run dev
+Після цього Vite запустить локальний сервер і відкриє проєкт у браузері. За замовчуванням сервер запускається на http://localhost:5173/.
+
+```
