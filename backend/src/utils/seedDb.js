@@ -1,6 +1,6 @@
 import {
     sequelize, Student, Teacher, TimeSlot, LanguageLevel, StudyGroup,
-    Teacher_LanguageLevel, Teacher_TimeSlot, StudyGroup_TimeSlot, Student_TimeSlot
+    Teacher_LanguageLevel, Teacher_TimeSlot, StudyGroup_TimeSlot, Student_TimeSlot,
 } from "../models/index.js";
 
 export async function seedDatabase() {
