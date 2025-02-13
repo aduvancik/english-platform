@@ -1,6 +1,5 @@
 import { Teacher } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
-import { teacherSchema } from "../utils/validationSchemas.js";
 import { ValidationError } from "yup";
 
 export const createTeacher = async (req, res) => {
@@ -9,8 +8,6 @@ export const createTeacher = async (req, res) => {
     const passwordHash = hashSha256(password);
 
     try {
-        await teacherSchema.validate(req.body);
-
         const newTeacher = await Teacher.create({
             firstName,
             lastName,
