@@ -1,5 +1,5 @@
-import { SidebarButton, BackButton } from "../../shared/ui";
-import { Logo } from "../../shared/icons";
+import { BackButton, SidebarButton } from "../../shared/ui";
+import Logo from "../Logo/Logo";
 
 export const Sidebar = () => {
     return (
