@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-
 function Input({ type, name, value, onChange, placeholder, className, error }) {
     return (
         <div className="flex flex-col w-full">
@@ -17,14 +15,6 @@ function Input({ type, name, value, onChange, placeholder, className, error }) {
     );
 }
 
-Input.propTypes = {
-    type: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    placeholder: PropTypes.string.isRequired,
-    className: PropTypes.string,
-    error: PropTypes.string,  // Accept error message as a string
-};
+
 
 export default Input;
