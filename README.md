@@ -11,34 +11,25 @@
 git clone https://github.com/aduvancik/english-platform.git
 ```
 
-<p>Frontend</p>
+<h3.>Running the frontend</h3>
 
 ```
 cd modules
 ```
 
-<p>2. Install npm modules</p>
+<p>3. Install npm modules</p>
 
 ```
 npm install
 ```
 
-<p>3. Start development server using below command</p>
+<p>4. Start development server using below command</p>
 
 ```
 npm run dev
 ```
 
-<p>4. Create production build using below command</p>
+<h3.>Running the backend</h3>
 
-```
-npm build
-```
-
-<p>5. Check production build locally using below command</p>
-
-```
-npm start
-```
 
 <h2>💖Like my work</h2>
