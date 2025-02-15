@@ -1,4 +1,4 @@
-import { Sidebar } from "../SideBar";
+import { Sidebar } from "../Sidebar";
 
 export const Dashboard = ({ children }) => {
     return (
@@ -8,3 +8,4 @@ export const Dashboard = ({ children }) => {
         </div>
     );
 };
+ 
