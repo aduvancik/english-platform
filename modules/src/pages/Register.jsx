@@ -191,7 +191,7 @@ function Register() {
 
 
     return (
-        <div className="flex items-center" style={{ height: '100vh' }}>
+        <div className="flex items-center h-100vh py-8">
             <form onSubmit={handleSubmit} className="w-full mx-auto rounded-[23px] pt-[50px] max-w-[695px] pb-[95px] bg-[#ffffff] flex flex-col justify-center">
                 <h1 className="text-[#141414] font-bold text-[32px] text-center">Реєстрація</h1>
                 <ThemeToggle
