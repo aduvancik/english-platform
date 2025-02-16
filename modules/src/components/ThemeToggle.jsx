@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-function RoleToggle({ className, onRoleChange }) {
-  const [isTeacher, setIsTeacher] = useState(true);
+function RoleToggle({ className, onRoleChange, roleIsTeacher }) {
+  const [isTeacher, setIsTeacher] = useState(roleIsTeacher);
 
   const toggleRole = () => {
     const newRole = !isTeacher;
