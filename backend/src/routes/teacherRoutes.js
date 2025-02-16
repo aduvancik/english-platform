@@ -9,7 +9,6 @@ import {
 
 const router = express.Router();
 
-//teacher
 router.post("/", createTeacher);
 router.get("/:id", getTeacherById);
 router.put("/:id", updateTeacher);

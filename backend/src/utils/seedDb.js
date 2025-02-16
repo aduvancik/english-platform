@@ -5,20 +5,9 @@ import {
 
 export async function seedDatabase() {
     try {
-
-        await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-        await Student_TimeSlot.drop();
-        await StudyGroup_TimeSlot.drop();
-        await Teacher_TimeSlot.drop();
-        await Teacher_LanguageLevel.drop();
-        await TimeSlot.drop();
-        await Student.drop();
-        await StudyGroup.drop();
-        await Teacher.drop();
-        await LanguageLevel.drop();
-        await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
-
+        await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
         await sequelize.sync({ force: true });
+        await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
 
         await LanguageLevel.bulkCreate([
             { name: "A1" },
