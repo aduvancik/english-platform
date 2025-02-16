@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "eslint . && nodemon src/index.js",
     "lint": "eslint ."
   },
   "keywords": [],
