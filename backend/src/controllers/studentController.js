@@ -1,9 +1,8 @@
 import { LanguageLevel, Student, StudyGroup } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
 import { studentSchema } from "../utils/validationSchemas.js";
-import { ValidationError } from "yup";
 
-export const createStudent = async (req, res) => {
+export const createStudent = async (req, res, next) => {
     try {
         await studentSchema.validate(req.body);
 
@@ -46,14 +45,11 @@ export const createStudent = async (req, res) => {
 
         return res.status(201).json({ message: "Student created" });
     } catch (er) {
-        if (er instanceof ValidationError) {
-            return res.status(400).json({ message: "Validation error" });
-        }
-        return res.status(500).json({ messsage: er.message });
+        next(er);
     }
 };
 
-export const getStudentById = async (req, res) => {
+export const getStudentById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const student = await Student.findByPk(id, {
@@ -66,11 +62,11 @@ export const getStudentById = async (req, res) => {
 
         return res.status(200).json(student);
     } catch (er) {
-        return res.status(500).json({ message: er.message });
+        next(er);
     }
 };
 
-export const getStudents = async (req, res) => {
+export const getStudents = async (req, res, next) => {
     try {
         const students = await Student.findAll({
             include: [LanguageLevel, StudyGroup],
@@ -78,11 +74,11 @@ export const getStudents = async (req, res) => {
 
         return res.status(200).json(students);
     } catch (er) {
-        return res.status(500).json({ message: er.message });
+        next(er);
     }
 };
 
-export const updateStudent = async (req, res) => {
+export const updateStudent = async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -104,11 +100,11 @@ export const updateStudent = async (req, res) => {
 
         return res.status(200).json({ message: "Student updated" });
     } catch (er) {
-        return res.status(500).json({ message: er.message });
+        next(er);
     }
 };
 
-export const deleteStudent = async (req, res) => {
+export const deleteStudent = async (req, res, next) => {
     try {
         const { id } = req.params;
 
@@ -124,6 +120,6 @@ export const deleteStudent = async (req, res) => {
 
         return res.status(200).json({ message: "Student deleted" });
     } catch (er) {
-        return res.status(500).json({ message: er.message });
+        next(er);
     }
 };
