@@ -2,10 +2,10 @@ import express from "express";
 import cors from "cors";
 import { studentRouter } from "./routes/studentRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
+import { studyGroupRouter } from "./routes/studyGroupRoutes.js";
 import { seedDatabase } from "./utils/seedDb.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
-// resetDatabase();
 seedDatabase();
 
 const app = express();
@@ -20,6 +20,7 @@ app.use(express.json());
 
 app.use("/students", studentRouter);
 app.use("/teachers", teacherRoutes);
+app.use("/study-groups", studyGroupRouter);
 
 app.use(errorHandler);
 
