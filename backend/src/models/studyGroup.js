@@ -15,6 +15,7 @@ StudyGroup.init(
         name: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
         },
         teacherId: {
             type: DataTypes.INTEGER,
