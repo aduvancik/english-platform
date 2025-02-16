@@ -1,13 +1,11 @@
 import { Teacher } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
-import { ValidationError } from "yup";
 
-export const createTeacher = async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
-
-    const passwordHash = hashSha256(password);
-
+export const createTeacher = async (req, res, next) => {
     try {
+        const { firstName, lastName, email, password } = req.body;
+        const passwordHash = hashSha256(password);
+
         const newTeacher = await Teacher.create({
             firstName,
             lastName,
@@ -16,18 +14,14 @@ export const createTeacher = async (req, res) => {
         });
 
         return res.status(201).json(newTeacher);
-    } catch (error) {
-        if (error instanceof ValidationError) {
-            return res.status(400).json({ message: "Validation error" });
-        }
-        return res.status(500).json({ message: "Error creating teacher", error });
+    } catch (er) {
+        next(er);
     }
 };
 
-export const getTeacherById = async (req, res) => {
-    const { id } = req.params;
-
+export const getTeacherById = async (req, res, next) => {
     try {
+        const { id } = req.params;
         const teacher = await Teacher.findByPk(id);
 
         if (!teacher) {
@@ -35,15 +29,14 @@ export const getTeacherById = async (req, res) => {
         }
 
         return res.status(200).json(teacher);
-    } catch (error) {
-        return res.status(500).json({ message: "Error retrieving teacher", error });
+    } catch (er) {
+        next(er);
     }
 };
 
-export const deleteTeacher = async (req, res) => {
-    const { id } = req.params;
-
+export const deleteTeacher = async (req, res, next) => {
     try {
+        const { id } = req.params;
         const teacher = await Teacher.findByPk(id);
 
         if (!teacher) {
@@ -52,13 +45,12 @@ export const deleteTeacher = async (req, res) => {
 
         await teacher.destroy();
         return res.status(200).json({ message: "Teacher deleted successfully" });
-    } catch (error) {
-        return res.status(500).json({ message: "Error deleting teacher", error });
+    } catch (er) {
+        next(er);
     }
 };
 
-
-export const updateTeacher = async (req, res) => {
+export const updateTeacher = async (req, res, next) => {
     const { id } = req.params;
     const { firstName, lastName, email, password } = req.body;
 
@@ -79,20 +71,16 @@ export const updateTeacher = async (req, res) => {
 
         await teacher.save();
         return res.status(200).json(teacher);
-    } catch (error) {
-        if (error instanceof ValidationError) {
-            return res.status(400).json({ message: "Validation error" });
-        }
-        return res.status(500).json({ message: "Error updating teacher", error });
+    } catch (er) {
+        next(er);
     }
 };
 
-
-export const getAllTeachers = async (req, res) => {
+export const getAllTeachers = async (req, res, next) => {
     try {
         const teachers = await Teacher.findAll();
         return res.status(200).json(teachers);
-    } catch (error) {
-        return res.status(500).json({ message: "Error retrieving teachers", error });
+    } catch (er) {
+        next(er);
     }
 };
