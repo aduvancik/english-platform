@@ -1,9 +1,9 @@
 import { AddUserIcon } from "../icons";
 
-export const AddUserButton = () => {
+export const AddUserButton = ({color}) => {
     return (
         <button className="bg-transparent">
-            <AddUserIcon />
+            <AddUserIcon color={color} />
         </button>
     );
 };
