@@ -5,6 +5,7 @@ import PrivateRoute from "../components/PrivateRoute";
 import LandingPage from "../pages/LandingPage";
 import { Dashboard } from "../components/Dashboard";
 import { StudentsList } from "../components/StudentsList/StudentsList";
+import Schedule from "../components/Schedule/Schedule";
 
 const AppRoutes = () => {
   return (
@@ -13,17 +14,20 @@ const AppRoutes = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route
+      {/* <Route
         path="/list"
         element={
           <Dashboard>
             <StudentsList />
           </Dashboard>
         }
-      />
-      {/* Приватні маршрути */}
-      <Route element={<PrivateRoute />}>
+      /> */}
+      <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="list" element={<StudentsList />} />
+        <Route path="schedule" element={<Schedule />} />
       </Route>
+      {/* Приватні маршрути */}
+      <Route element={<PrivateRoute />}></Route>
     </Routes>
   );
 };
