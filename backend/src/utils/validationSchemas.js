@@ -10,7 +10,7 @@ export const studentSchema = object({
     }).required(),
     studyGroup: object({
         name: string().max(255).required(),
-    }).required(),
+    }).nullable(),
 });
 
 export const studyGroupSchema = object({
