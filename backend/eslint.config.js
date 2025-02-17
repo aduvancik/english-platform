@@ -16,9 +16,22 @@ export default [
         semi: true,
     }),
     {
+        files: ["src/**/*"],
         languageOptions: { globals: globals.node },
         plugins: {
             "@stylistic/js": stylistic,
+        },
+    },
+    {
+        files: ["src/middlewares/*.js"],
+        languageOptions: { globals: globals.node },
+        plugins: {
+            "@stylistic/js": stylistic,
+        },
+        rules: {
+            "no-unused-vars": ["error", {
+                args: "none",
+            }],
         },
     },
     pluginJs.configs.recommended,

@@ -1,15 +1,19 @@
 import { useState } from "react";
 import ThemeToggle from "../components/ThemeToggle";
 import Input from "../components/Input";
+import { useLocation } from "react-router-dom";
 
 function Register() {
+    const location = useLocation();
+    const roleIsTeacher = location.state?.roleIsTeacher ?? true;
+
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
         email: "",
         englishLevel: [],
         password: "",
-        role: "teacher",
+        role: roleIsTeacher ? "teacher" : "student",
     });
 
     const [errors, setErrors] = useState({});
@@ -196,9 +200,10 @@ function Register() {
                 <h1 className="text-[#141414] font-bold text-[32px] text-center">Реєстрація</h1>
                 <ThemeToggle
                     className="mx-auto mt-[45px] mb-[63px]"
-                    isTeacher={formData.role === "teacher"} // передаємо статус вчителя/учня
-                    onRoleChange={handleRoleChange}
-                />
+                    roleIsTeacher={formData.role === "teacher"} // передаємо статус вчителя/учня
+                    onRoleChange={(newRole) =>
+                        setFormData((prev) => ({ ...prev, role: newRole ? "teacher" : "student", englishLevel: [] }))
+                    } />
                 <div className="pl-[71px] pr-[41px] gap-[25px] flex flex-col">
                     <Input
                         type="text"

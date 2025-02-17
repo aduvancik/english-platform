@@ -7,7 +7,7 @@ export class Student_TimeSlot extends Model {}
 
 Student_TimeSlot.init(
     {
-        StudentId: {
+        studentId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -15,7 +15,7 @@ Student_TimeSlot.init(
                 key: "id",
             },
         },
-        TimeSlotId: {
+        timeSlotId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
