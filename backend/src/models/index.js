@@ -9,45 +9,61 @@ import { Teacher_TimeSlot } from "./teacher_timeSlot.js";
 import { StudyGroup_TimeSlot } from "./studyGroup_timeSlot.js";
 import { Student_TimeSlot } from "./student_timeSlot.js";
 
-Teacher.belongsToMany(LanguageLevel, { through: Teacher_LanguageLevel });
-LanguageLevel.belongsToMany(Teacher, { through: Teacher_LanguageLevel });
-
-LanguageLevel.hasMany(StudyGroup, {
-    foreignKey: {
-        allowNull: false,
-    },
+Teacher.belongsToMany(LanguageLevel, {
+    through: Teacher_LanguageLevel,
+    foreignKey: "teacherId",
+    otherKey: "languageLevelId",
 });
-StudyGroup.belongsTo(LanguageLevel);
-
-Teacher.hasMany(StudyGroup, {
-    foreignKey: {
-        allowNull: false,
-    },
+LanguageLevel.belongsToMany(Teacher, {
+    through: Teacher_LanguageLevel,
+    foreignKey: "languageLevelId",
+    otherKey: "teacherId",
 });
-StudyGroup.belongsTo(Teacher);
 
-LanguageLevel.hasMany(Student, {
-    foreignKey: {
-        allowNull: false,
-    },
+LanguageLevel.hasMany(StudyGroup, { foreignKey: "languageLevelId" });
+StudyGroup.belongsTo(LanguageLevel, { foreignKey: "languageLevelId" });
+
+Teacher.hasMany(StudyGroup, { foreignKey: "teacherId" });
+StudyGroup.belongsTo(Teacher, { foreignKey: "teacherId" });
+
+LanguageLevel.hasMany(Student, { foreignKey: "languageLevelId" });
+Student.belongsTo(LanguageLevel, { foreignKey: "languageLevelId" });
+
+StudyGroup.hasMany(Student, { foreignKey: "studyGroupId" });
+Student.belongsTo(StudyGroup, { foreignKey: "studyGroupId" });
+
+Teacher.belongsToMany(TimeSlot, {
+    through: Teacher_TimeSlot,
+    foreignKey: "teacherId",
+    otherKey: "timeSlotId",
 });
-Student.belongsTo(LanguageLevel);
-
-StudyGroup.hasMany(Student, {
-    foreignKey: {
-        allowNull: false,
-    },
+TimeSlot.belongsToMany(Teacher, {
+    through: Teacher_TimeSlot,
+    foreignKey: "timeSlotId",
+    otherKey: "teacherId",
 });
-Student.belongsTo(StudyGroup);
 
-Teacher.belongsToMany(TimeSlot, { through: Teacher_TimeSlot });
-TimeSlot.belongsToMany(Teacher, { through: Teacher_TimeSlot });
+StudyGroup.belongsToMany(TimeSlot, {
+    through: StudyGroup_TimeSlot,
+    foreignKey: "studyGroupId",
+    otherKey: "timeSlotId",
+});
+TimeSlot.belongsToMany(StudyGroup, {
+    through: StudyGroup_TimeSlot,
+    foreignKey: "timeSlotId",
+    otherKey: "studyGroupId",
+});
 
-StudyGroup.belongsToMany(TimeSlot, { through: StudyGroup_TimeSlot });
-TimeSlot.belongsToMany(StudyGroup, { through: StudyGroup_TimeSlot });
-
-Student.belongsToMany(TimeSlot, { through: Student_TimeSlot });
-TimeSlot.belongsToMany(Student, { through: Student_TimeSlot });
+Student.belongsToMany(TimeSlot, {
+    through: Student_TimeSlot,
+    foreignKey: "studentId",
+    otherKey: "timeSlotId",
+});
+TimeSlot.belongsToMany(Student, {
+    through: Student_TimeSlot,
+    foreignKey: "timeSlotId",
+    otherKey: "studentId",
+});
 
 export {
     sequelize, Student, Teacher, TimeSlot, LanguageLevel, StudyGroup,

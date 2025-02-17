@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 
-function RoleToggle({ className, onRoleChange }) {
-  const [isTeacher, setIsTeacher] = useState(true);
+function RoleToggle({ className, onRoleChange, roleIsTeacher }) {
+  const [isTeacher, setIsTeacher] = useState(roleIsTeacher);
 
   const toggleRole = () => {
     const newRole = !isTeacher;
@@ -26,10 +25,5 @@ function RoleToggle({ className, onRoleChange }) {
     </div>
   );
 }
-
-RoleToggle.propTypes = {
-  className: PropTypes.string,
-  onRoleChange: PropTypes.func.isRequired, // функція для передачі зміни ролі
-};
 
 export default RoleToggle;

@@ -63,7 +63,7 @@ export const StudentsList = () => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const res = await axios.get(`http://localhost:4000${API.students}`);
+                // const res = await axios.get(`http://localhost:4000${API.students}`);
                 setStudents(res.data);
             } catch (err) {
                 console.error("Error fetching students:", err);

@@ -38,6 +38,7 @@ const ChooseRoleSection = () => {
                 to="/register"
                 className="inline-block mt-6 bg-pink-600 font-semibold py-2 px-4 rounded-lg hover:bg-pink-700 transition duration-300 ease-in-out"
                 style={{ fontFamily: "var(--font-oswald)" }}
+                state={{ roleIsTeacher: false }}
               >
                 Стати Учнем →
               </Link>
