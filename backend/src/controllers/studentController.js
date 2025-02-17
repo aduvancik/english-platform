@@ -30,17 +30,14 @@ export const createStudent = async (req, res, next) => {
                 name: studyGroupName,
             },
         });
-        if (!studyGroup) {
-            return res.status(400).json({ message: `Study group ${studyGroupName} not found` });
-        }
 
         await Student.create({
             firstName,
             lastName,
             email,
             passwordHash,
-            LanguageLevelId: languageLevel.id,
-            StudyGroupId: studyGroup.id,
+            languageLevelId: languageLevel.id,
+            studyGroupId: studyGroup?.id,
         });
 
         return res.status(201).json({ message: "Student created" });

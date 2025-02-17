@@ -27,59 +27,59 @@ export async function seedDatabase() {
         ]);
 
         await Teacher_LanguageLevel.bulkCreate([
-            { TeacherId: 1, LanguageLevelId: 3 },
-            { TeacherId: 1, LanguageLevelId: 4 },
-            { TeacherId: 1, LanguageLevelId: 5 },
-            { TeacherId: 2, LanguageLevelId: 1 },
-            { TeacherId: 2, LanguageLevelId: 2 },
+            { teacherId: 1, languageLevelId: 3 },
+            { teacherId: 1, languageLevelId: 4 },
+            { teacherId: 1, languageLevelId: 5 },
+            { teacherId: 2, languageLevelId: 1 },
+            { teacherId: 2, languageLevelId: 2 },
         ]);
 
         await StudyGroup.bulkCreate([
-            { TeacherId: 1, LanguageLevelId: 4, name: "High Five" },
-            { TeacherId: 1, LanguageLevelId: 5, name: "Avant Garde" },
-            { TeacherId: 2, LanguageLevelId: 1, name: "Beginner Group A1" },
-            { TeacherId: 2, LanguageLevelId: 2, name: "Beginner Group A2" },
+            { teacherId: 1, languageLevelId: 4, name: "High Five" },
+            { teacherId: 1, languageLevelId: 5, name: "Avant Garde" },
+            { teacherId: 2, languageLevelId: 1, name: "Beginner Group A1" },
+            { teacherId: 2, languageLevelId: 2, name: "Beginner Group A2" },
         ]);
 
         await Student.bulkCreate([
-            { LanguageLevelId: 1, StudyGroupId: 1, firstName: "Oleksandr", lastName: "Salah", email: "regeln@example.com", passwordHash: "6427435774b539b7eb87924b92d5d417" },
-            { LanguageLevelId: 2, StudyGroupId: 3, firstName: "Sofia", lastName: "Hopp", email: "sofa@example.com", passwordHash: "hashed_password" },
-            { LanguageLevelId: 3, StudyGroupId: 1, firstName: "oleg", lastName: "Krivogub", email: "oleg.doe@example.com", passwordHash: "6427435774b539b7eb87924b92d5d417" },
-            { LanguageLevelId: 3, StudyGroupId: 3, firstName: "Solomiia", lastName: "Kava", email: "solomiia@example.com", passwordHash: "my_hashed_password" },
-            { LanguageLevelId: 4, StudyGroupId: 3, firstName: "Yurii", lastName: "Nagorniak", email: "nagorniak@example.com", passwordHash: "dc647eb65e6711e155375218212b3964" },
-            { LanguageLevelId: 4, StudyGroupId: 1, firstName: "Anastasiia", lastName: "Klishch", email: "anastasiia@example.com", passwordHash: "hashed_password" },
+            { languageLevelId: 1, studyGroupId: 1, firstName: "Oleksandr", lastName: "Salah", email: "regeln@example.com", passwordHash: "6427435774b539b7eb87924b92d5d417" },
+            { languageLevelId: 2, studyGroupId: 3, firstName: "Sofia", lastName: "Hopp", email: "sofa@example.com", passwordHash: "hashed_password" },
+            { languageLevelId: 3, studyGroupId: 1, firstName: "oleg", lastName: "Krivogub", email: "oleg.doe@example.com", passwordHash: "6427435774b539b7eb87924b92d5d417" },
+            { languageLevelId: 3, studyGroupId: 3, firstName: "Solomiia", lastName: "Kava", email: "solomiia@example.com", passwordHash: "my_hashed_password" },
+            { languageLevelId: 4, studyGroupId: 3, firstName: "Yurii", lastName: "Nagorniak", email: "nagorniak@example.com", passwordHash: "dc647eb65e6711e155375218212b3964" },
+            { languageLevelId: 4, studyGroupId: 1, firstName: "Anastasiia", lastName: "Klishch", email: "anastasiia@example.com", passwordHash: "hashed_password" },
         ]);
 
         await TimeSlot.bulkCreate(generateTimeSlotData());
 
         await Teacher_TimeSlot.bulkCreate([
-            { TeacherId: 1, TimeSlotId: 34 },
-            { TeacherId: 1, TimeSlotId: 46 },
-            { TeacherId: 1, TimeSlotId: 58 },
-            { TeacherId: 1, TimeSlotId: 66 },
-            { TeacherId: 2, TimeSlotId: 10 },
-            { TeacherId: 2, TimeSlotId: 37 },
-            { TeacherId: 2, TimeSlotId: 76 },
-            { TeacherId: 2, TimeSlotId: 80 },
+            { teacherId: 1, timeSlotId: 34 },
+            { teacherId: 1, timeSlotId: 46 },
+            { teacherId: 1, timeSlotId: 58 },
+            { teacherId: 1, timeSlotId: 66 },
+            { teacherId: 2, timeSlotId: 10 },
+            { teacherId: 2, timeSlotId: 37 },
+            { teacherId: 2, timeSlotId: 76 },
+            { teacherId: 2, timeSlotId: 80 },
         ]);
 
         await StudyGroup_TimeSlot.bulkCreate([
-            { StudyGroupId: 1, TimeSlotId: 34 },
-            { StudyGroupId: 1, TimeSlotId: 46 },
-            { StudyGroupId: 1, TimeSlotId: 58 },
-            { StudyGroupId: 2, TimeSlotId: 66 },
-            { StudyGroupId: 3, TimeSlotId: 10 },
-            { StudyGroupId: 3, TimeSlotId: 80 },
-            { StudyGroupId: 4, TimeSlotId: 37 },
+            { studyGroupId: 1, timeSlotId: 34 },
+            { studyGroupId: 1, timeSlotId: 46 },
+            { studyGroupId: 1, timeSlotId: 58 },
+            { studyGroupId: 2, timeSlotId: 66 },
+            { studyGroupId: 3, timeSlotId: 10 },
+            { studyGroupId: 3, timeSlotId: 80 },
+            { studyGroupId: 4, timeSlotId: 37 },
         ]);
 
         await Student_TimeSlot.bulkCreate([
-            { StudentId: 1, TimeSlotId: 10 },
-            { StudentId: 1, TimeSlotId: 20 },
-            { StudentId: 1, TimeSlotId: 30 },
-            { StudentId: 1, TimeSlotId: 34 },
-            { StudentId: 1, TimeSlotId: 54 },
-            { StudentId: 1, TimeSlotId: 66 },
+            { studentId: 1, timeSlotId: 10 },
+            { studentId: 1, timeSlotId: 20 },
+            { studentId: 1, timeSlotId: 30 },
+            { studentId: 1, timeSlotId: 34 },
+            { studentId: 1, timeSlotId: 54 },
+            { studentId: 1, timeSlotId: 66 },
         ]);
     } catch (er) {
         console.log(`Error: ${er}`);

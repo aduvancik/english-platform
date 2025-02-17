@@ -7,7 +7,7 @@ export class StudyGroup_TimeSlot extends Model {}
 
 StudyGroup_TimeSlot.init(
     {
-        StudyGroupId: {
+        studyGroupId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -15,7 +15,7 @@ StudyGroup_TimeSlot.init(
                 key: "id",
             },
         },
-        TimeSlotId: {
+        timeSlotId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {

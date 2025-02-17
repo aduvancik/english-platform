@@ -32,8 +32,8 @@ export const createStudyGroup = async (req, res, next) => {
 
         await StudyGroup.create({
             name,
-            TeacherId: teacherId,
-            LanguageLevelId: languageLevel.id,
+            teacherId: teacherId,
+            languageLevelId: languageLevel.id,
         });
 
         return res.status(201).json({ message: "Study group created" });

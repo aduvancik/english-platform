@@ -1,7 +1,21 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db/index.js";
+import { LanguageLevel } from "./languageLevel.js";
+import { StudyGroup } from "./studyGroup.js";
 
-export class Student extends Model {}
+export class Student extends Model {
+    toJSON() {
+        const values = { ...this.get() };
+
+        values.languageLevel = values.LanguageLevel;
+        values.studyGroup = values.StudyGroup;
+
+        delete values.LanguageLevel;
+        delete values.StudyGroup;
+
+        return values;
+    }
+}
 
 Student.init(
     {
@@ -25,6 +39,21 @@ Student.init(
         passwordHash: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        languageLevelId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: LanguageLevel,
+                key: "id",
+            },
+        },
+        studyGroupId: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: StudyGroup,
+                key: "id",
+            },
         },
     },
     {

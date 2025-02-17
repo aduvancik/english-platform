@@ -7,7 +7,7 @@ export class Teacher_LanguageLevel extends Model {}
 
 Teacher_LanguageLevel.init(
     {
-        TeacherId: {
+        teacherId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
@@ -15,7 +15,7 @@ Teacher_LanguageLevel.init(
                 key: "id",
             },
         },
-        LanguageLevelId: {
+        languageLevelId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
