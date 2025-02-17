@@ -3,7 +3,19 @@ import { sequelize } from "../db/index.js";
 import { Teacher } from "./teacher.js";
 import { LanguageLevel } from "./languageLevel.js";
 
-export class StudyGroup extends Model {}
+export class StudyGroup extends Model {
+    toJSON() {
+        const values = { ...this.get() };
+
+        values.teacher = values.Teacher;
+        values.languageLevel = values.LanguageLevel;
+
+        delete values.Teacher;
+        delete values.LanguageLevel;
+
+        return values;
+    }
+}
 
 StudyGroup.init(
     {
