@@ -3,7 +3,7 @@ import Logo from "../Logo/Logo";
 
 export const Sidebar = () => {
     return (
-        <div className="w-[20%] pt-3 bg-white h-[100vh] flex flex-col">
+        <div className="w-[20%] pt-3 bg-white h-full fixed flex flex-col">
             <div className="flex items-center justify-around mb-10">
                 <Logo />
                 <BackButton />

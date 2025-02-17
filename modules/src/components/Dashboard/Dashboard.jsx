@@ -1,10 +1,11 @@
 import { Sidebar } from "../SideBar";
+import './custom.css'
 
 export const Dashboard = ({ children }) => {
     return (
-        <div className="flex px-5 pt-5">
+        <div className="dashboard flex px-5 pt-5 font-raleway custom-dashboard h-screen">
             <Sidebar />
-            <div className="w-[75%] ml-[80px]">{children}</div>
+            <div className="ml-[25%] w-[75%]">{children}</div>
         </div>
     );
 };

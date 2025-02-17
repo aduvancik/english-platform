@@ -1,3 +1,5 @@
-export * from "./BackArrow.jsx";
+export * from "./BackArrowIcon.jsx";
 export * from "./Logo.jsx";
-export * from "./AddUserIcon.jsx"
+export * from "./AddUserIcon.jsx";
+export * from "./OptionIcon.jsx";
+export * from "./StudentsIcon.jsx";
