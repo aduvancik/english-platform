@@ -1,7 +1,10 @@
 import { Teacher, LanguageLevel, StudyGroup } from "../models/index.js";
+import { studyGroupSchema } from "../utils/validationSchemas.js";
 
 export const createStudyGroup = async (req, res, next) => {
     try {
+        await studyGroupSchema.validate(req.body);
+
         const {
             name,
             teacher: {

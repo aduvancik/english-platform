@@ -1,4 +1,4 @@
-import { object, string } from "yup";
+import { object, string, number } from "yup";
 
 export const studentSchema = object({
     firstName: string().max(255).required(),
@@ -9,6 +9,16 @@ export const studentSchema = object({
         name: string().max(255).required(),
     }).required(),
     studyGroup: object({
+        name: string().max(255).required(),
+    }).required(),
+});
+
+export const studyGroupSchema = object({
+    name: string().max(255).required(),
+    teacher: object({
+        id: number().integer().required(),
+    }).required(),
+    languageLevel: object({
         name: string().max(255).required(),
     }).required(),
 });
