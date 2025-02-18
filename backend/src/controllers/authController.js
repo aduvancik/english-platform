@@ -8,20 +8,16 @@ import { createTeacher } from "./teacherController.js";
 
 export const registerUser = async (req, res, next) => {
     try {
-        const { role, languageLevel } = req.body;
+        const { role } = req.body;
 
         if (!["student", "teacher"].includes(role)) {
             return res.status(400).json({ message: "Invalid role" });
         }
 
-        if (role === "student" && !languageLevel) {
-            return res.status(400).json({ message: "Language level is required for students" });
-        }
-
         if (role === "student") {
-            return createStudent(req, res);
+            return createStudent(req, res, next);
         } else if (role === "teacher") {
-            return createTeacher(req, res);
+            return createTeacher(req, res, next);
         }
     } catch (er) {
         next(er);
@@ -30,10 +26,16 @@ export const registerUser = async (req, res, next) => {
 
 export const loginUser = async (req, res, next) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;
+        let user;
 
-        let user = await Student.findOne({ where: { email } });
-        if (!user) {
+        if (!["student", "teacher"].includes(role)) {
+            return res.status(400).json({ message: "Invalid role" });
+        }
+
+        if (role === "student") {
+            user = await Student.findOne({ where: { email } });
+        } else if (role === "teacher") {
             user = await Teacher.findOne({ where: { email } });
         }
 
@@ -43,16 +45,15 @@ export const loginUser = async (req, res, next) => {
 
         const passwordHash = hashSha256(password);
         if (user.passwordHash !== passwordHash) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
         const token = generateToken({
             id: user.id,
-            email: user.email,
-            role: user.role,
+            role,
         });
 
-        return res.status(200).json({ user, token });
+        return res.status(200).json({ token });
     } catch (er) {
         next(er);
     }
