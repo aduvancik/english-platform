@@ -11,33 +11,18 @@ export const createStudent = async (req, res, next) => {
             lastName,
             email,
             password,
-            languageLevel: { name: languageLevelName },
-            studyGroup: { name: studyGroupName },
+            languageLevelId,
+            studyGroupId,
         } = req.body;
         const passwordHash = hashSha256(password);
-
-        const languageLevel = await LanguageLevel.findOne({
-            where: {
-                name: languageLevelName,
-            },
-        });
-        if (!languageLevel) {
-            return res.status(400).json({ message: `Language level ${languageLevelName} not found` });
-        }
-
-        const studyGroup = await StudyGroup.findOne({
-            where: {
-                name: studyGroupName,
-            },
-        });
 
         await Student.create({
             firstName,
             lastName,
             email,
             passwordHash,
-            languageLevelId: languageLevel.id,
-            studyGroupId: studyGroup?.id,
+            languageLevelId,
+            studyGroupId,
         });
 
         return res.status(201).json({ message: "Student created" });

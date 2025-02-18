@@ -7,12 +7,8 @@ export const createStudyGroup = async (req, res, next) => {
 
         const {
             name,
-            teacher: {
-                id: teacherId,
-            },
-            languageLevel: {
-                id: languageLevelId,
-            },
+            teacherId,
+            languageLevelId,
         } = req.body;
 
         await StudyGroup.create({
