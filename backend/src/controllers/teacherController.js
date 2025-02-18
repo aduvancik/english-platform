@@ -5,17 +5,18 @@ import { teacherSchema } from "../utils/validationSchemas.js";
 export const createTeacher = async (req, res, next) => {
     try {
         await teacherSchema.validate(req.body);
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, languageLevelIds } = req.body;
         const passwordHash = hashSha256(password);
 
-        const newTeacher = await Teacher.create({
+        const teacher = await Teacher.create({
             firstName,
             lastName,
             email,
             passwordHash,
         });
+        await teacher.addLanguageLevels(languageLevelIds);
 
-        return res.status(201).json(newTeacher);
+        return res.status(201).json({ message: "Teacher created" });
     } catch (er) {
         next(er);
     }
