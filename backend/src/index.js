@@ -4,7 +4,6 @@ import { studentRouter } from "./routes/studentRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
 import { studyGroupRouter } from "./routes/studyGroupRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import protectedRoutes from "./routes/protectedRoutes.js";
 import { seedDatabase } from "./utils/seedDb.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
@@ -21,7 +20,6 @@ app.use(cors({
 app.use(express.json());
 
 app.use("/auth", authRoutes);
-app.use("/protected", protectedRoutes);
 
 app.use("/students", studentRouter);
 app.use("/teachers", teacherRoutes);
