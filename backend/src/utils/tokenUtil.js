@@ -6,17 +6,9 @@ export const generateToken = (user) => {
         {
             id: user.id,
             email: user.email,
-            role: user.role, 
+            role: user.role,
         },
         config.secretKey,
-        { expiresIn: "1h" }
+        { expiresIn: "1h" },
     );
-};
-
-export const verifyToken = (token) => {
-    try {
-        return jwt.verify(token, config.secretKey);
-    } catch (err) {
-        return null;
-    }
 };

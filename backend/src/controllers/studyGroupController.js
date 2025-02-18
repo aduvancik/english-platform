@@ -11,32 +11,14 @@ export const createStudyGroup = async (req, res, next) => {
                 id: teacherId,
             },
             languageLevel: {
-                name: languageLevelName,
+                id: languageLevelId,
             },
         } = req.body;
 
-        const teacher = await Teacher.findOne({
-            where: {
-                id: teacherId,
-            },
-        });
-        if (!teacher) {
-            return res.status(400).json({ message: `Teacher with id ${teacherId} not found` });
-        }
-
-        const languageLevel = await LanguageLevel.findOne({
-            where: {
-                name: languageLevelName,
-            },
-        });
-        if (!languageLevel) {
-            return res.status(400).json({ message: `Language level ${languageLevelName} not found` });
-        }
-
         await StudyGroup.create({
             name,
-            teacherId: teacherId,
-            languageLevelId: languageLevel.id,
+            teacherId,
+            languageLevelId,
         });
 
         return res.status(201).json({ message: "Study group created" });

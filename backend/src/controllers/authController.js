@@ -6,15 +6,15 @@ import { hashSha256 } from "../utils/hashUtil.js";
 import { createStudent } from "./studentController.js";
 import { createTeacher } from "./teacherController.js";
 
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password, role, languageLevelId } = req.body;
+        const { role, languageLevel } = req.body;
 
         if (!["student", "teacher"].includes(role)) {
             return res.status(400).json({ message: "Invalid role" });
         }
 
-        if (role === "student" && !languageLevelId) {
+        if (role === "student" && !languageLevel) {
             return res.status(400).json({ message: "Language level is required for students" });
         }
 
@@ -23,14 +23,12 @@ export const registerUser = async (req, res) => {
         } else if (role === "teacher") {
             return createTeacher(req, res);
         }
-        
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Error registering user" });
+    } catch (er) {
+        next(er);
     }
 };
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -43,7 +41,7 @@ export const loginUser = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const passwordHash = hashSha256(password); 
+        const passwordHash = hashSha256(password);
         if (user.passwordHash !== passwordHash) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
@@ -55,9 +53,7 @@ export const loginUser = async (req, res) => {
         });
 
         return res.status(200).json({ user, token });
-
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Error logging in user" });
+    } catch (er) {
+        next(er);
     }
 };
