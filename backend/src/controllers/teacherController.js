@@ -1,8 +1,11 @@
 import { Teacher } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
+import { teacherSchema } from "../utils/validationSchemas.js";
 
 export const createTeacher = async (req, res, next) => {
     try {
+        await teacherSchema.validate(req.body);
+
         const { firstName, lastName, email, password } = req.body;
         const passwordHash = hashSha256(password);
 
