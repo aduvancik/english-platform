@@ -14,7 +14,7 @@ export const StudentRequests = ({ students }) => {
                         key={student.id}
                         name={student.firstName}
                         surname={student.lastName}
-                        languageLevel={student.LanguageLevel.name}
+                        languageLevel={student.languageLevel.name}
                     />
                 ))}
             </ul>
