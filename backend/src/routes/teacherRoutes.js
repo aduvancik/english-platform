@@ -6,13 +6,14 @@ import {
     deleteTeacher,
     getAllTeachers,
 } from "../controllers/teacherController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", createTeacher);
-router.get("/:id", getTeacherById);
+router.get("/", authMiddleware, getAllTeachers);
+router.get("/:id", authMiddleware, getTeacherById);
 router.put("/:id", updateTeacher);
 router.delete("/:id", deleteTeacher);
-router.get("/", getAllTeachers);
 
 export default router;

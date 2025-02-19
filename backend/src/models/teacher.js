@@ -21,6 +21,7 @@ Teacher.init(
         email: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
         },
         passwordHash: {
             type: DataTypes.STRING,
