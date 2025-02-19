@@ -1,8 +1,8 @@
 import { AddUserIcon } from "../icons";
 
-export const AddUserButton = ({color}) => {
+export const AddUserButton = ({ color, onClick = () => {} }) => {
     return (
-        <button className="bg-transparent">
+        <button onClick={onClick}  className="bg-transparent">
             <AddUserIcon color={color} />
         </button>
     );
