@@ -6,23 +6,15 @@ import { GroupInfoModal } from "./GroupInfoModal.jsx";
 import api from "../../api/api";
 
 const getGroupsWithStudents = (students, groups) => {
-    const groupsWithStudents = groups;
-
-    for (const groupKey in groups) {
-        const studentsInGroup = [];
-        for (const student of students) {
-            if (student.studyGroupId === groups[groupKey].id) {
-                studentsInGroup.push(student);
-            }
-        }
-        groups[groupKey].students = studentsInGroup;
-    }
-
-    return groupsWithStudents;
+    return groups.map((group) => ({
+        ...group,
+        students: students.filter((student) => student.studyGroupId === group.id),
+    }));
 };
 
 export const TeachingGroups = ({ students }) => {
     const [groups, setGroups] = useState([]);
+    const [originalGroups, setOriginalGroups] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -38,7 +30,7 @@ export const TeachingGroups = ({ students }) => {
         const fetchGroups = async () => {
             try {
                 const res = await api.get(API_ROUTES.groups);
-                setGroups(res.data);
+                setOriginalGroups(res.data);
             } catch (err) {
                 console.error("Error fetching groups: ", err);
                 setError(err);
@@ -51,10 +43,10 @@ export const TeachingGroups = ({ students }) => {
     }, []);
 
     useEffect(() => {
-        if (groups && students) {
-            setGroups(getGroupsWithStudents(students, groups));
+        if (originalGroups && students) {
+            setGroups(getGroupsWithStudents(students, originalGroups));
         }
-    }, [students, groups]);
+    }, [students, originalGroups]);
 
     useEffect(() => {
         const group = groups.find((group) => group.id === selectedGroupId);
@@ -70,14 +62,14 @@ export const TeachingGroups = ({ students }) => {
                     <div>
                         <h3 className="text-[20px]">Moї групи</h3>
                         <ul className="flex flex-wrap gap-3 mt-[15px]">
-                            {!loading &&
+                            {!loading && groups &&
                                 groups.map((group) => (
                                     <GroupCard
                                         key={group.id}
                                         group={group}
                                         selectGroup={setSelectedGroupId}
                                         openModal={handleOpenModal}
-                                        studentsAmount={group.students.length}
+                                        studentsAmount={group.students ? group.students.length : 0}
                                     />
                                 ))}
                         </ul>
