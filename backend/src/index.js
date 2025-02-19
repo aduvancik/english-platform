@@ -6,6 +6,7 @@ import { studyGroupRouter } from "./routes/studyGroupRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { seedDatabase } from "./utils/seedDb.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { timeSlotRouter } from "./routes/timeSlotRoutes.js";
 
 seedDatabase();
 
@@ -24,6 +25,7 @@ app.use("/auth", authRoutes);
 app.use("/students", studentRouter);
 app.use("/teachers", teacherRoutes);
 app.use("/study-groups", studyGroupRouter);
+app.use("/time-slots", timeSlotRouter);
 
 app.use(errorHandler);
 
