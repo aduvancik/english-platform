@@ -1,5 +1,7 @@
+import { Navigate, Outlet } from "react-router-dom";
+
 export default function PrivateRoute() {
-  return (
-    <div>PrivateRoute</div>
-  )
+  const authToken = localStorage.getItem("authToken");
+
+  return authToken ? <Outlet /> : <Navigate to="/login" replace />;
 }
