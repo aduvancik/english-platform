@@ -49,7 +49,7 @@ export const deleteTeacher = async (req, res, next) => {
         }
 
         await teacher.destroy();
-        return res.status(200).json({ message: "Teacher deleted successfully" });
+        return res.status(200).json({ message: "Teacher deleted" });
     } catch (er) {
         next(er);
     }
@@ -75,7 +75,7 @@ export const updateTeacher = async (req, res, next) => {
         }
 
         await teacher.save();
-        return res.status(200).json(teacher);
+        return res.status(200).json({ message: "Teacher updated" });
     } catch (er) {
         next(er);
     }
