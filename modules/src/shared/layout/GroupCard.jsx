@@ -6,8 +6,6 @@ export const GroupCard = ({ group, selectGroup, openModal, studentsAmount }) => 
     return (
         <div
             onClick={() => {
-                console.log("Group ");
-                console.log(group.id);
                 selectGroup(group.id);
                 openModal();
             }}
