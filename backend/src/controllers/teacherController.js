@@ -6,7 +6,7 @@ export const createTeacher = async (req, res, next) => {
     try {
         await teacherSchema.validate(req.body);
 
-        const { firstName, lastName, email, password, languageLevelIds } = req.body;
+        const { firstName, lastName, email, password, languageLevelIds, timeSlotIds } = req.body;
 
         const passwordHash = hashSha256(password);
 
@@ -17,6 +17,7 @@ export const createTeacher = async (req, res, next) => {
             passwordHash,
         });
         await teacher.addLanguageLevels(languageLevelIds);
+        await teacher.addTimeSlots(timeSlotIds);
 
         return res.status(201).json({ message: "Teacher created" });
     } catch (er) {

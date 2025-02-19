@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    createTeacher,
     getTeacherById,
     updateTeacher,
     deleteTeacher,
@@ -12,7 +11,6 @@ import { authorizationOwnUserId } from "../middlewares/authorizationOwnUserId.js
 
 const router = express.Router();
 
-router.post("/", createTeacher);
 router.get("/", authMiddleware, getAllTeachers);
 router.get("/:id", authMiddleware, getTeacherById);
 router.put("/:id", authMiddleware, authorizationTeacher, authorizationOwnUserId, updateTeacher);

@@ -1,6 +1,5 @@
 import express from "express";
 import {
-    createStudent,
     getStudents,
     getStudentById,
     updateStudent,
@@ -12,7 +11,6 @@ import { authorizationOwnUserId } from "../middlewares/authorizationOwnUserId.js
 
 export const studentRouter = express.Router();
 
-studentRouter.post("/", createStudent);
 studentRouter.get("/", authMiddleware, getStudents);
 studentRouter.get("/:id", authMiddleware, getStudentById);
 studentRouter.put("/:id", authMiddleware, authorizationStudent, authorizationOwnUserId, updateStudent);
