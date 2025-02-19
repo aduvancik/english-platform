@@ -13,10 +13,11 @@ export const createStudent = async (req, res, next) => {
             password,
             languageLevelId,
             studyGroupId,
+            timeSlotIds,
         } = req.body;
         const passwordHash = hashSha256(password);
 
-        await Student.create({
+        const student = await Student.create({
             firstName,
             lastName,
             email,
@@ -24,6 +25,7 @@ export const createStudent = async (req, res, next) => {
             languageLevelId,
             studyGroupId,
         });
+        student.addTimeSlots(timeSlotIds);
 
         return res.status(201).json({ message: "Student created" });
     } catch (er) {

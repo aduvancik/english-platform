@@ -5,17 +5,14 @@ export const createStudyGroup = async (req, res, next) => {
     try {
         await studyGroupSchema.validate(req.body);
 
-        const {
-            name,
-            teacherId,
-            languageLevelId,
-        } = req.body;
+        const { name, teacherId, languageLevelId, timeSlotIds } = req.body;
 
-        await StudyGroup.create({
+        const studyGroup = await StudyGroup.create({
             name,
             teacherId,
             languageLevelId,
         });
+        await studyGroup.addTimeSlots(timeSlotIds);
 
         return res.status(201).json({ message: "Study group created" });
     } catch (er) {
