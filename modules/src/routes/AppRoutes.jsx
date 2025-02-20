@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import PrivateRoute from "../components/PrivateRoute";
+// import PrivateRoute from "../components/PrivateRoute";
 import LandingPage from "../pages/LandingPage";
 import { Dashboard } from "../components/Dashboard";
 import { StudentsList } from "../components/StudentsList/StudentsList";
@@ -31,7 +31,7 @@ const AppRoutes = () => {
         <Route path="support" element={<Support />} />
       </Route>
       {/* Приватні маршрути */}
-      <Route element={<PrivateRoute />}></Route>
+      {/* <Route element={<PrivateRoute />}></Route> */}
     </Routes>
   );
 };
