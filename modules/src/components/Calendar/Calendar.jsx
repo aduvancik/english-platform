@@ -5,11 +5,12 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
-import { API } from "../../shared/api";
+// import { API } from "../../shared/api";
 
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import "../Calendar/Calendar.css";
+import { API_ROUTES } from "../../shared/api/api-routes";
 
 const Calendar = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -30,7 +31,7 @@ const Calendar = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await axios.get(`http://localhost:4000${API.students}`);
+      const { data } = await axios.get(`http://localhost:4000${API_ROUTES.students}`);
       setStudents(data);
       console.log(data);
     };

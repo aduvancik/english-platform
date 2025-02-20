@@ -1,7 +1,20 @@
-import { useState } from "react";
-import ThemeToggle from "../components/ThemeToggle";
-import Input from "../components/Input";
+import { useEffect, useState } from "react";
+import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { englishLevels, days, hours } from "../shared/constants/data";
+import { filterTimeSlots } from "../shared/utils/filterTimeSlots";
+import { validate } from "../shared/utils/validate";
+import { handleChange } from "../shared/utils/handleChange";
+import { handleSelectDays } from "../shared/utils/handleSelectDays";
+import { handleSelectHour } from "../shared/utils/handleSelectHour";
+import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
+import SelectedDays from "../components/SelectedDays/SelectedDays";
+import SelectedHour from "../components/SelectedHour/SelectedHour";
+import useSelectLevel from "../shared/hooks/useSelectLevel";
+import Input from "../components/Input/Input";
+import Notification from "../components/Notification/Notification";
+import { API_ROUTES } from "../shared/api/api-routes";
 
 function Register() {
     const location = useLocation();
@@ -11,14 +24,19 @@ function Register() {
         firstName: "",
         lastName: "",
         email: "",
-        englishLevel: [],
+        languageLevelId: [],
         hour: [],
         day: [],
+        timeSlotIds: [],
         password: "",
         role: roleIsTeacher ? "teacher" : "student",
+        studyGroupId: null
     });
 
     const [errors, setErrors] = useState({});
+    const [notification, setNotification] = useState("");
+    const [error, setError] = useState({});
+    const [responseData, setResponseData] = useState([]);
     const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
     const [dropdowns, setDropdowns] = useState({
         hours: false,
@@ -26,124 +44,79 @@ function Register() {
         level: false,
     });
 
-    const englishLevels = {
-        A1: 0,
-        A2: 1,
-        B1: 2,
-        B2: 3,
-        C1: 4,
-        C2: 5,
-    };
+    useEffect(() => {
+        const fetchTimeSlots = async () => {
+            try {
+                const response = await axios.get(`http://localhost:4000/time-slots`);
+                setResponseData(response.data); // зберігаємо отримані тайм слоти в state
+            } catch (error) {
+                setError("Error fetching time slots"); // обробка помилок
 
-    const days = {
-        "понеділок - четвер": 0,
-        "вівторок- пятниця": 1,
-        "середа- субота": 2,
-    };
-    const hours = {
-        "17:00 - 18:00": 0,
-        "18:00- 19:00": 1,
-        "19:00- 20:00": 2,
-        "20:00- 21:00": 3,
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        // Оновлюємо значення форми
-        if (name === "englishLevel") {
-            setFormData({
-                ...formData,
-                englishLevel: englishLevels[value] !== undefined ? [englishLevels[value]] : formData.englishLevel,
-            });
-        } else if (name === "day") {
-            setFormData({
-                ...formData,
-                day: days[value] !== undefined ? [days[value]] : formData.day,
-            });
-        } else if (name === "hour") {
-            setFormData({
-                ...formData,
-                hours: days[value] !== undefined ? [hours[value]] : formData.hour,
-            })
-        } else {
-            setFormData({
-                ...formData,
-                [name]: value,
-            });
-        }
-        // Перевірка полів для помилок
-        let updatedErrors = { ...errors };
-
-        if (name === "firstName") {
-            if (value.length < 2 || value.length > 50) {
-                updatedErrors.firstName = "Ім'я має бути від 2 до 50 символів";
-            } else {
-                delete updatedErrors.firstName;
+                console.log("Error fetching time slots");
             }
-        }
+        };
 
-        if (name === "lastName") {
-            if (value.length < 2 || value.length > 50) {
-                updatedErrors.lastName = "Прізвище має бути від 2 до 50 символів";
-            } else {
-                delete updatedErrors.lastName;
-            }
-        }
+        fetchTimeSlots();
+    }, []);
 
-        if (name === "email") {
-            if (!value.includes("@") || value.length > 100) {
-                updatedErrors.email = "Некоректний email (макс. 100 символів)";
-            } else {
-                delete updatedErrors.email;
-            }
-        }
+    useEffect(() => {
+        if (!responseData.length) return;
 
-        if (name === "password") {
-            if (value.length < 6) {
-                updatedErrors.password = "Пароль має містити щонайменше 6 символів";
-            } else {
-                delete updatedErrors.password;
-            }
-        }
-
-        if (name === "englishLevel") {
-            if (!value && value !== 0) {
-                updatedErrors.englishLevel = "Оберіть рівень англійської";
-            } else {
-                delete updatedErrors.englishLevel;
-            }
-        }
-
-        setErrors(updatedErrors);
-    };
+        const timeSlotIds = filterTimeSlots(responseData, formData.day, formData.hour);
+        console.log("timeSlotIds", filterTimeSlots(responseData, formData.day, formData.hour));
 
 
+        setFormData((prev) => ({
+            ...prev,
+            timeSlotIds
+        }));
+    }, [responseData, formData.day, formData.hour]);
 
-    const validate = () => {
-        const errors = {};
-        if (formData.firstName.length < 2 || formData.firstName.length > 50) errors.firstName = "Ім'я має бути від 2 до 50 символів";
-        if (formData.lastName.length < 2 || formData.lastName.length > 50) errors.lastName = "Прізвище має бути від 2 до 50 символів";
-        if (!formData.email.includes("@") || formData.email.length > 100) errors.email = "Некоректний email";
-        if (formData.englishLevel.length === 0) errors.englishLevel = "Оберіть рівень англійської";
-        if (formData.day.length === 0) errors.day = "Оберіть дні тижня";
-        if (formData.hour.length === 0) errors.hour = "Оберіть години";
-        if (formData.password.length < 6) errors.password = "Пароль має бути мінімум 6 символів";
 
-        setErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsFormSubmitted(true); // Встановлюємо статус, що форма була надіслана
-        console.log(formData, "handleSubmit");
 
+        setIsFormSubmitted(true);
 
-        if (validate()) {
-            console.log("Submitted Data:", formData);
+        if (!validate(formData, setErrors)) return;
+
+        // Формування payload в залежності від ролі
+        const payload = formData.role === "teacher"
+            ? {
+                role: formData.role,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                password: formData.password,
+                languageLevelIds: formData.languageLevelId,
+                timeSlotIds: formData.timeSlotIds
+            }
+            : {
+                role: formData.role,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                languageLevelIds: formData.languageLevelId[0],
+                password: formData.password,
+                studyGroupId: formData.studyGroupId,
+                timeSlotIds: formData.timeSlotIds,
+            };
+
+        console.log("Data being sent:", JSON.stringify(payload)); // Логування відправлених даних
+
+        try {
+            // Надсилання запиту на сервер
+            const { data } = await axios.post(`http://localhost:4000${API_ROUTES.auth.register}`, payload);
+            console.log("Registration successful:", data);
+        } catch (error) {
+            console.error("Error sending data:", error.response?.data || error.message);
+
         }
     };
+
+    // Використання у компоненті
+    const onInputChange = (e) => handleChange(e, formData, setFormData, errors, setErrors, englishLevels, days, hours);
+
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && !e.target.closest('.theme-toggle')) {
@@ -159,147 +132,32 @@ function Register() {
     };
 
     //функція для вибору рівня англійської
-    const handleSelectLevel = (level) => {
-        const selectedLevel = englishLevels[level];
-
-        if (formData.role === "student") {
-            // студент може вибирати лише один варіант
-            setFormData({
-                ...formData,
-                englishLevel: [selectedLevel],
-            });
-        } else {
-            setFormData((prevFormData) => {
-                const newLevels = prevFormData.englishLevel.includes(selectedLevel)
-                    ? prevFormData.englishLevel.filter((lvl) => lvl !== selectedLevel) // Remove if already selected
-                    : [...prevFormData.englishLevel, selectedLevel]; // Add the new level
-
-                return {
-                    ...prevFormData,
-                    englishLevel: newLevels,
-                };
-            });
-        }
-
-        if (formData.role === "student") {
-            setDropdowns(() => ({
-                hours: false,
-                days: false,
-                subjects: false,
-            }));
-        }
-    };
+    const handleSelectLevel = useSelectLevel(formData, setFormData, setDropdowns, englishLevels);
 
     //функція для вибору дня тижня
-    const handleSelectDays = (day) => {
-        const selectedDay = days[day];
+    const onSelectDay = (day) => handleSelectDays(day, days, formData, setFormData, setDropdowns);
 
-        if (formData.role === "student") {
-            // студент може вибирати лише один варіант
-            setFormData({
-                ...formData,
-                day: [selectedDay],
-            });
-        } else {
-            setFormData((prevFormData) => {
-                const newDays = prevFormData.day.includes(selectedDay)
-                    ? prevFormData.englishLevel.filter((lvl) => lvl !== selectedLevel)
-                    : [...prevFormData.day, selectedDay];
-
-                return {
-                    ...prevFormData,
-                    day: newDays,
-                };
-            });
-        }
-
-        if (formData.role === "student") {
-            setDropdowns(() => ({
-                hours: false,
-                days: false,
-                subjects: false,
-            }));
-
-        }
-    };
 
     //функція для вибору годин
-    const handleSelectHour = (hour) => {
-        const selectedHour = hours[hour];
-
-        setFormData((prevFormData) => {
-            const newHours = prevFormData.hour.includes(selectedHour)
-                ? prevFormData.hour.filter((hr) => hr !== selectedHour)
-                : [...prevFormData.hour, selectedHour];
-
-            return {
-                ...prevFormData,
-                hour: newHours,
-            };
-        });
-    };
-
-
-    //render for level, dey, hour
-
-    const renderSelectedLevels = () => {
-        if (formData.role === "student") {
-            return formData.englishLevel.length > 0
-                ? Object.keys(englishLevels).find(key => englishLevels[key] === formData.englishLevel[0])
-                : <span className="text-[#A9A9A9]">Обрати рівень</span>;
-        } else {
-            return formData.englishLevel.length > 0
-                ? formData.englishLevel.map((level) => (
-                    <span key={level} className="text-[#A9A9A9] mr-2">
-                        {Object.keys(englishLevels).find(key => englishLevels[key] === level)}
-                    </span>
-                ))
-                : <span className="text-[#A9A9A9]">Обрати рівень</span>;
-        }
-    };
-
-    const renderSelectedDays = () => {
-        if (formData.role === "student") {
-            return formData.day.length > 0
-                ? Object.keys(days).find(key => days[key] === formData.day[0])
-                : <span className="text-[#A9A9A9]">Обрати рівень</span>;
-        } else {
-            return formData.day.length > 0
-                ? formData.day.map((day) => (
-                    <span key={day} className="text-[#A9A9A9] mr-2">
-                        {Object.keys(days).find(key => days[key] === day)}
-                    </span>
-                ))
-                : <span className="text-[#A9A9A9]">Обрати дні</span>;
-        }
-    };
-
-    const renderSelectedHour = () => {
-        return formData.hour.length > 0
-            ? formData.hour.map((hour) => (
-                <span key={hour} className="text-[#A9A9A9] mr-2">
-                    {Object.keys(hours).find(key => hours[key] === hour)}
-                </span>
-            ))
-            : <span className="text-[#A9A9A9]">Обрати години</span>;
-    };
+    const onSelectHour = (hour) => handleSelectHour(hour, hours, setFormData);
 
     return (
         <div className="flex items-center h-100vh py-8">
+            {/* <Notification message={notification} /> */}
             <form onSubmit={handleSubmit} className="w-full mx-auto rounded-[23px] pt-[50px] max-w-[695px] pb-[95px] bg-[#ffffff] flex flex-col justify-center">
                 <h1 className="text-[#141414] font-bold text-[32px] text-center">Реєстрація</h1>
                 <ThemeToggle
                     className="mx-auto mt-[45px] mb-[63px]"
                     roleIsTeacher={formData.role === "teacher"} // передаємо статус вчителя/учня
                     onRoleChange={(newRole) =>
-                        setFormData((prev) => ({ ...prev, role: newRole ? "teacher" : "student", englishLevel: [], day: [] }))
+                        setFormData((prev) => ({ ...prev, role: newRole ? "teacher" : "student", languageLevelId: [], day: [] }))
                     } />
                 <div className="pl-[71px] pr-[41px] gap-[25px] flex flex-col">
                     <Input
                         type="text"
                         name="firstName"
                         value={formData.firstName}
-                        onChange={handleChange}
+                        onChange={onInputChange}
                         onKeyDown={handleKeyDown}
                         placeholder="Ім'я"
                         error={isFormSubmitted && errors.firstName}
@@ -308,7 +166,7 @@ function Register() {
                         type="text"
                         name="lastName"
                         value={formData.lastName}
-                        onChange={handleChange}
+                        onChange={onInputChange}
                         onKeyDown={handleKeyDown}
                         placeholder="Прізвище"
                         error={isFormSubmitted && errors.lastName}
@@ -317,7 +175,7 @@ function Register() {
                         type="email"
                         name="email"
                         value={formData.email}
-                        onChange={handleChange}
+                        onChange={onInputChange}
                         onKeyDown={handleKeyDown}
                         placeholder="Електронна пошта"
                         error={isFormSubmitted && errors.email}
@@ -326,7 +184,7 @@ function Register() {
                         type="password"
                         name="password"
                         value={formData.password}
-                        onChange={handleChange}
+                        onChange={onInputChange}
                         onKeyDown={handleKeyDown}
                         placeholder="Пароль"
                         error={isFormSubmitted && errors.password}
@@ -337,7 +195,8 @@ function Register() {
                             onClick={() => toggleDropdown("level")}
                         >
                             <span>
-                                {renderSelectedLevels()}
+                                {renderSelectedLevels(formData, englishLevels)}
+
                             </span>
 
                             <span className="text-xl">
@@ -359,7 +218,7 @@ function Register() {
                                 ))}
                             </div>
                         )}
-                        {isFormSubmitted && errors.englishLevel && <span style={{ color: "red" }}>{errors.englishLevel}</span>}
+                        {isFormSubmitted && errors.languageLevelId && <span style={{ color: "red" }}>{errors.languageLevelId}</span>}
                     </div>
                     <div className="relative">
                         <div
@@ -367,7 +226,7 @@ function Register() {
                             onClick={() => toggleDropdown("days")}
                         >
                             <span>
-                                {renderSelectedDays()}
+                                <SelectedDays formData={formData} days={days} />
                             </span>
 
                             <span className="text-xl">
@@ -382,7 +241,7 @@ function Register() {
                                     <div
                                         key={day}
                                         className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
-                                        onClick={() => handleSelectDays(day)}
+                                        onClick={() => onSelectDay(day)}
                                     >
                                         {day}
                                     </div>
@@ -397,7 +256,7 @@ function Register() {
                             onClick={() => toggleDropdown("hours")}
                         >
                             <span>
-                                {renderSelectedHour()}
+                                <SelectedHour formData={formData} hours={hours} />
                             </span>
 
                             <span className="text-xl">
@@ -412,7 +271,7 @@ function Register() {
                                     <div
                                         key={hour}
                                         className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
-                                        onClick={() => handleSelectHour(hour)}
+                                        onClick={() => onSelectHour(hour)}
                                     >
                                         {hour}
                                     </div>

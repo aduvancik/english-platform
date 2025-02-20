@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Input from "../components/Input";
+import Input from "../components/Input/Input";
 import { NavLink } from "react-router-dom";
-// import Link from "react-router-dom"
-
+import axios from "axios";
+import { API_ROUTES } from "../shared/api/api-routes";
 function Login() {
     const [checked, setChecked] = useState(false);
     const [formData, setFormData] = useState({
@@ -11,18 +11,15 @@ function Login() {
     });
 
     const [errors, setErrors] = useState({});
-    const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
+    const [isFormSubmitted, setIsFormSubmitted] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        // Оновлюємо значення форми
         setFormData({
             ...formData,
             [name]: value,
         });
 
-        // Перевірка полів для помилок
         let updatedErrors = { ...errors };
 
         if (name === "email") {
@@ -58,19 +55,33 @@ function Login() {
         return Object.keys(errors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsFormSubmitted(true); // Встановлюємо статус, що форма була надіслана
+        setIsFormSubmitted(true);
 
         if (validate()) {
-            console.log("Submitted Data:", formData);
+            try {
+                const payload = {
+                    email: formData.email,
+                    password: formData.password,
+                    role: "teacher"
+                };
+
+                console.log("Data being sent:", JSON.stringify(payload));
+
+                const { data } = await axios.post(`http://localhost:4000${API_ROUTES.auth.login}`, payload);
+                console.log("Login successful:", data);
+                // Handle successful login (e.g., redirect to dashboard)
+            } catch (error) {
+                console.error("Error sending data:", error.response?.data || error.message);
+            }
         }
     };
 
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            handleSubmit(e); // Викликаємо обробник відправки
+            handleSubmit(e);
         }
     };
 
