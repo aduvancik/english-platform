@@ -1,20 +1,26 @@
+//react
 import { useEffect, useState } from "react";
-import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+//constans
 import { englishLevels, days, hours } from "../shared/constants/data";
+//utils function
 import { filterTimeSlots } from "../shared/utils/filterTimeSlots";
 import { validate } from "../shared/utils/validate";
 import { handleChange } from "../shared/utils/handleChange";
 import { handleSelectDays } from "../shared/utils/handleSelectDays";
 import { handleSelectHour } from "../shared/utils/handleSelectHour";
-import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
+//hooks
+import useSelectLevel from "../shared/hooks/useSelectLevel";
+//components
 import SelectedDays from "../components/SelectedDays/SelectedDays";
 import SelectedHour from "../components/SelectedHour/SelectedHour";
-import useSelectLevel from "../shared/hooks/useSelectLevel";
+import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
 import Input from "../components/Input/Input";
 import NotificationMessage from "../components/NotificationMessage/NotificationMessage";
+import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
+//api
 import { API_ROUTES } from "../shared/api/api-routes";
+import axios from "axios";
 
 function Register() {
     const location = useLocation();
@@ -120,7 +126,7 @@ function Register() {
 
         } catch (error) {
             console.error("Error sending data:", error.response?.data || error.message);
-            setNotification( {
+            setNotification({
                 boolean: false,
                 message: String(error.response?.data || error.message)
             });
