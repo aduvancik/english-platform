@@ -1,7 +1,4 @@
 export const filterTimeSlots = (timeSlots, selectedDays, selectedHours) => {
-    console.log("selectedDays", selectedDays);
-    console.log("timeSlots", timeSlots);
-    console.log("selectedHours", selectedHours);
     
   return timeSlots
       .filter((slot) => {

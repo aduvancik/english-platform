@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { englishLevels, days, hours } from "../shared/constants/data";
 import { filterTimeSlots } from "../shared/utils/filterTimeSlots";
@@ -13,12 +13,13 @@ import SelectedDays from "../components/SelectedDays/SelectedDays";
 import SelectedHour from "../components/SelectedHour/SelectedHour";
 import useSelectLevel from "../shared/hooks/useSelectLevel";
 import Input from "../components/Input/Input";
-import Notification from "../components/Notification/Notification";
+import NotificationMessage from "../components/NotificationMessage/NotificationMessage";
 import { API_ROUTES } from "../shared/api/api-routes";
 
 function Register() {
     const location = useLocation();
     const roleIsTeacher = location.state?.roleIsTeacher ?? true;
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         firstName: "",
@@ -34,7 +35,10 @@ function Register() {
     });
 
     const [errors, setErrors] = useState({});
-    const [notification, setNotification] = useState("");
+    const [notification, setNotification] = useState({
+        boolean: true,
+        message: ""
+    });
     const [error, setError] = useState({});
     const [responseData, setResponseData] = useState([]);
     const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
@@ -80,7 +84,6 @@ function Register() {
 
         if (!validate(formData, setErrors)) return;
 
-        // Формування payload в залежності від ролі
         const payload = formData.role === "teacher"
             ? {
                 role: formData.role,
@@ -102,17 +105,28 @@ function Register() {
                 timeSlotIds: formData.timeSlotIds,
             };
 
-        console.log("Data being sent:", JSON.stringify(payload)); // Логування відправлених даних
+        console.log("Data being sent:", JSON.stringify(payload));
 
         try {
-            // Надсилання запиту на сервер
             const { data } = await axios.post(`http://localhost:4000${API_ROUTES.auth.register}`, payload);
-            console.log("Registration successful:", data);
+
+            setNotification(prev => ({
+                boolean: true,
+                message: "Registration successful!"
+            }));
+
+            // Можливо, ви хочете перенаправити користувача на іншу сторінку після реєстрації
+            navigate("/dashboard");
+
         } catch (error) {
             console.error("Error sending data:", error.response?.data || error.message);
-
+            setNotification( {
+                boolean: false,
+                message: String(error.response?.data || error.message)
+            });
         }
     };
+
 
     // Використання у компоненті
     const onInputChange = (e) => handleChange(e, formData, setFormData, errors, setErrors, englishLevels, days, hours);
@@ -143,7 +157,7 @@ function Register() {
 
     return (
         <div className="flex items-center h-100vh py-8">
-            {/* <Notification message={notification} /> */}
+            <NotificationMessage message={notification.message} boolean={notification.boolean} />
             <form onSubmit={handleSubmit} className="w-full mx-auto rounded-[23px] pt-[50px] max-w-[695px] pb-[95px] bg-[#ffffff] flex flex-col justify-center">
                 <h1 className="text-[#141414] font-bold text-[32px] text-center">Реєстрація</h1>
                 <ThemeToggle
