@@ -2,8 +2,7 @@ import { useState } from "react";
 import Input from "../components/Input/Input";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
-import { API } from "../shared/api";
-
+import { API_ROUTES } from "../shared/api/api-routes";
 function Login() {
     const [checked, setChecked] = useState(false);
     const [formData, setFormData] = useState({
@@ -70,7 +69,7 @@ function Login() {
 
                 console.log("Data being sent:", JSON.stringify(payload));
 
-                const { data } = await axios.post(`http://localhost:4000${API.login}`, payload);
+                const { data } = await axios.post(`http://localhost:4000${API_ROUTES.auth.login}`, payload);
                 console.log("Login successful:", data);
                 // Handle successful login (e.g., redirect to dashboard)
             } catch (error) {

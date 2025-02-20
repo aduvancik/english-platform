@@ -3,7 +3,6 @@ import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { englishLevels, days, hours } from "../shared/constants/data";
-import { API } from "../shared/api";
 import { filterTimeSlots } from "../shared/utils/filterTimeSlots";
 import { validate } from "../shared/utils/validate";
 import { handleChange } from "../shared/utils/handleChange";
@@ -15,6 +14,7 @@ import SelectedHour from "../components/SelectedHour/SelectedHour";
 import useSelectLevel from "../shared/hooks/useSelectLevel";
 import Input from "../components/Input/Input";
 import Notification from "../components/Notification/Notification";
+import { API_ROUTES } from "../shared/api/api-routes";
 
 function Register() {
     const location = useLocation();
@@ -47,7 +47,7 @@ function Register() {
     useEffect(() => {
         const fetchTimeSlots = async () => {
             try {
-                const response = await axios.get(`http://localhost:4000${API.timeSlots}`);
+                const response = await axios.get(`http://localhost:4000/time-slots`);
                 setResponseData(response.data); // зберігаємо отримані тайм слоти в state
             } catch (error) {
                 setError("Error fetching time slots"); // обробка помилок
@@ -63,6 +63,8 @@ function Register() {
         if (!responseData.length) return;
 
         const timeSlotIds = filterTimeSlots(responseData, formData.day, formData.hour);
+        console.log("timeSlotIds", filterTimeSlots(responseData, formData.day, formData.hour));
+
 
         setFormData((prev) => ({
             ...prev,
@@ -97,14 +99,14 @@ function Register() {
                 languageLevelIds: formData.languageLevelId[0],
                 password: formData.password,
                 studyGroupId: formData.studyGroupId,
-                timeSlotIds: formData.timeSlotIds[0],
+                timeSlotIds: formData.timeSlotIds,
             };
 
         console.log("Data being sent:", JSON.stringify(payload)); // Логування відправлених даних
 
         try {
             // Надсилання запиту на сервер
-            const { data } = await axios.post(`http://localhost:4000${API.register}`, payload);
+            const { data } = await axios.post(`http://localhost:4000${API_ROUTES.auth.register}`, payload);
             console.log("Registration successful:", data);
         } catch (error) {
             console.error("Error sending data:", error.response?.data || error.message);
