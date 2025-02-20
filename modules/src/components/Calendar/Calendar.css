@@ -1,0 +1,33 @@
+.fc .fc-button-primary {
+  background-color: #5b21b6;
+  border-color: #5b21b6;
+  transition: all 300ms ease-in-out;
+}
+
+.fc .fc-button-primary:hover {
+  background-color: #4c1d95;
+  border-color: #4c1d95;
+}
+
+.fc .fc-button-primary:disabled {
+  background-color: #5b21b6;
+  border-color: #5b21b6;
+}
+
+.fc .fc-button-primary.fc-prev-button,
+.fc .fc-button-primary.fc-next-button {
+  background-color: #10b981;
+  border-color: #10b981;
+  transition: all 300ms ease-in-out;
+}
+
+.fc .fc-button-primary.fc-prev-button:hover,
+.fc .fc-button-primary.fc-next-button:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: #4c1d95;
+  border-color: #4c1d95;
+}
