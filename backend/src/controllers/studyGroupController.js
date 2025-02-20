@@ -5,39 +5,14 @@ export const createStudyGroup = async (req, res, next) => {
     try {
         await studyGroupSchema.validate(req.body);
 
-        const {
+        const { name, teacherId, languageLevelId, timeSlotIds } = req.body;
+
+        const studyGroup = await StudyGroup.create({
             name,
-            teacher: {
-                id: teacherId,
-            },
-            languageLevel: {
-                name: languageLevelName,
-            },
-        } = req.body;
-
-        const teacher = await Teacher.findOne({
-            where: {
-                id: teacherId,
-            },
+            teacherId,
+            languageLevelId,
         });
-        if (!teacher) {
-            return res.status(400).json({ message: `Teacher with id ${teacherId} not found` });
-        }
-
-        const languageLevel = await LanguageLevel.findOne({
-            where: {
-                name: languageLevelName,
-            },
-        });
-        if (!languageLevel) {
-            return res.status(400).json({ message: `Language level ${languageLevelName} not found` });
-        }
-
-        await StudyGroup.create({
-            name,
-            teacherId: teacherId,
-            languageLevelId: languageLevel.id,
-        });
+        await studyGroup.addTimeSlots(timeSlotIds);
 
         return res.status(201).json({ message: "Study group created" });
     } catch (er) {

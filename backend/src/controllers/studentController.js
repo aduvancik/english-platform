@@ -11,38 +11,25 @@ export const createStudent = async (req, res, next) => {
             lastName,
             email,
             password,
-            languageLevel: { name: languageLevelName },
-            studyGroup: { name: studyGroupName },
+            languageLevelId,
+            studyGroupId,
+            timeSlotIds,
         } = req.body;
         const passwordHash = hashSha256(password);
 
-        const languageLevel = await LanguageLevel.findOne({
-            where: {
-                name: languageLevelName,
-            },
-        });
-        if (!languageLevel) {
-            return res.status(400).json({ message: `Language level ${languageLevelName} not found` });
-        }
-
-        const studyGroup = await StudyGroup.findOne({
-            where: {
-                name: studyGroupName,
-            },
-        });
-
-        await Student.create({
+        const student = await Student.create({
             firstName,
             lastName,
             email,
             passwordHash,
-            languageLevelId: languageLevel.id,
-            studyGroupId: studyGroup?.id,
+            languageLevelId,
+            studyGroupId,
         });
+        student.addTimeSlots(timeSlotIds);
 
         return res.status(201).json({ message: "Student created" });
     } catch (er) {
-        next(er);
+        next (er);
     }
 };
 
@@ -80,21 +67,21 @@ export const updateStudent = async (req, res, next) => {
         const { id } = req.params;
 
         const { firstName, lastName, email, password } = req.body;
-        const passwordHash = hashSha256(password);
+        const student = await Student.findByPk(id);
 
-        const [updatedCount] = await Student.update(
-            { firstName, lastName, email, passwordHash },
-            {
-                where: {
-                    id,
-                },
-            },
-        );
-
-        if (!updatedCount) {
-            return res.status(404).json({ message: "Student not found" });
+        if (!student) {
+            return res.status(404).json({ message: "Teacher not found" });
         }
 
+        student.firstName = firstName || student.firstName;
+        student.lastName = lastName || student.lastName;
+        student.email = email || student.email;
+
+        if (password) {
+            student.passwordHash = hashSha256(password);
+        }
+
+        await student.save();
         return res.status(200).json({ message: "Student updated" });
     } catch (er) {
         next(er);

@@ -1,31 +1,40 @@
-import { object, string, number } from "yup";
+import { object, string, number, array } from "yup";
 
 export const studentSchema = object({
     firstName: string().max(255).required(),
     lastName: string().max(255).required(),
     email: string().max(255).email().required(),
     password: string().min(8).max(255).required(),
-    languageLevel: object({
-        name: string().max(255).required(),
-    }).required(),
-    studyGroup: object({
-        name: string().max(255).required(),
-    }).nullable(),
+    languageLevelId: number().integer().required(),
+    studyGroupId: number().integer().nullable(),
+    timeSlotIds: array()
+        .of(number().integer().required())
+        .min(1)
+        .required(),
 });
 
 export const studyGroupSchema = object({
     name: string().max(255).required(),
-    teacher: object({
-        id: number().integer().required(),
-    }).required(),
-    languageLevel: object({
-        name: string().max(255).required(),
-    }).required(),
+    teacherId: number().integer().required(),
+    languageLevelId: number().integer().required(),
+    timeSlotIds: array()
+        .of(number().integer().required())
+        .min(1)
+        .required(),
 });
 
 export const teacherSchema = object({
-    firstName: string().min(2, "First name must be at least 2 characters long").max(255).required(),
-    lastName: string().min(2, "Last name must be at least 2 characters long").max(255).required(),
-    email: string().max(255).email("Invalid email format").required(),
-    password: string().min(8, "Password must be at least 8 characters long").max(255).required(),
+    firstName: string().max(255).required(),
+    lastName: string().max(255).required(),
+    email: string().max(255).email().required(),
+    password: string().min(8).max(255).required(),
+    languageLevelIds: array()
+        .of(number().integer().required())
+        .min(1)
+        .max(6)
+        .required(),
+    timeSlotIds: array()
+        .of(number().integer().required())
+        .min(1)
+        .required(),
 });

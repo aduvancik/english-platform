@@ -6,17 +6,20 @@ export const createTeacher = async (req, res, next) => {
     try {
         await teacherSchema.validate(req.body);
 
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, languageLevelIds, timeSlotIds } = req.body;
+
         const passwordHash = hashSha256(password);
 
-        const newTeacher = await Teacher.create({
+        const teacher = await Teacher.create({
             firstName,
             lastName,
             email,
             passwordHash,
         });
+        await teacher.addLanguageLevels(languageLevelIds);
+        await teacher.addTimeSlots(timeSlotIds);
 
-        return res.status(201).json(newTeacher);
+        return res.status(201).json({ message: "Teacher created" });
     } catch (er) {
         next(er);
     }
@@ -47,7 +50,7 @@ export const deleteTeacher = async (req, res, next) => {
         }
 
         await teacher.destroy();
-        return res.status(200).json({ message: "Teacher deleted successfully" });
+        return res.status(200).json({ message: "Teacher deleted" });
     } catch (er) {
         next(er);
     }
@@ -73,7 +76,7 @@ export const updateTeacher = async (req, res, next) => {
         }
 
         await teacher.save();
-        return res.status(200).json(teacher);
+        return res.status(200).json({ message: "Teacher updated" });
     } catch (er) {
         next(er);
     }
