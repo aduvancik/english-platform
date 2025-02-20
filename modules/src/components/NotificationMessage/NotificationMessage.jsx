@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const Notification = ({ message }) => {
+const NotificationMessage = ({ message, boolean }) => {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
@@ -14,10 +14,10 @@ const Notification = ({ message }) => {
     if (!visible) return null;
 
     return (
-        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
+        <div className={`fixed bottom-5 left-1/2 transform -translate-x-1/2 ${boolean ? "bg-green-500" : "bg-red-500"} text-white px-4 py-2 rounded-md shadow-lg z-50`}>
             {message}
         </div>
     );
 };
 
-export default Notification;
+export default NotificationMessage;

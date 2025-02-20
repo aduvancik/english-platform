@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "../components/Input/Input";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import { API_ROUTES } from "../shared/api/api-routes";
+import { useNavigate } from "react-router-dom";
+import NotificationMessage from "../components/NotificationMessage/NotificationMessage";
+
 function Login() {
-    const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState(false); // Статус checkbox "Запам'ятати мене"
+    const navigate = useNavigate();
+    const [notification, setNotification] = useState({
+        boolean: true,
+        message: ""
+    });
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -12,6 +20,20 @@ function Login() {
 
     const [errors, setErrors] = useState({});
     const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
+    // Перевірка наявності запам'ятаних даних при завантаженні компонента
+    useEffect(() => {
+        const savedEmail = localStorage.getItem("email");
+        const savedPassword = localStorage.getItem("password");
+
+        if (savedEmail && savedPassword) {
+            setFormData({
+                email: savedEmail,
+                password: savedPassword
+            });
+            setChecked(true); // Якщо є, то checkbox "Запам'ятати мене" має бути відмічений
+        }
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -64,16 +86,38 @@ function Login() {
                 const payload = {
                     email: formData.email,
                     password: formData.password,
-                    role: "teacher"
+                    role: "teacher",
                 };
 
                 console.log("Data being sent:", JSON.stringify(payload));
 
                 const { data } = await axios.post(`http://localhost:4000${API_ROUTES.auth.login}`, payload);
                 console.log("Login successful:", data);
-                // Handle successful login (e.g., redirect to dashboard)
+                setNotification({
+                    boolean: true,
+                    message: String("Login successful")
+                });
+
+                // Зберігаємо email і пароль у localStorage якщо користувач вибрав "Запам'ятати мене"
+                if (checked) {
+                    localStorage.setItem("email", formData.email);
+                    localStorage.setItem("password", formData.password);
+                } else {
+                    // Якщо не вибрано "Запам'ятати мене", очищаємо їх з localStorage
+                    localStorage.removeItem("email");
+                    localStorage.removeItem("password");
+                }
+
+                // Зберігаємо токен у localStorage
+                localStorage.setItem("authToken", data.token);
+
+                navigate('/dashboard');
             } catch (error) {
                 console.error("Error sending data:", error.response?.data || error.message);
+                setNotification({
+                    boolean: false,
+                    message: "incorrect data!"
+                });
             }
         }
     };
@@ -87,6 +131,7 @@ function Login() {
 
     return (
         <div className="flex items-center" style={{ height: '100vh' }}>
+            <NotificationMessage message={notification.message} boolean={notification.boolean} />
             <form onSubmit={handleSubmit} className="w-full mx-auto rounded-[23px] pt-[50px] max-w-[695px] pb-[95px] bg-[#ffffff] flex flex-col justify-center">
                 <h1 className="text-[#141414] font-bold text-[32px] text-center mb-[61px]">Вхід</h1>
                 <div className="pl-[52px] pr-[60px] gap-[25px] flex flex-col">
