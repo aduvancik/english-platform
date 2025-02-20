@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
-import Input from "../components/Input/Input";
+//react
 import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+//components
+import Input from "../components/Input/Input";
+import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
+import NotificationMessage from "../components/NotificationMessage/NotificationMessage";
+//api
 import axios from "axios";
 import { API_ROUTES } from "../shared/api/api-routes";
-import { useNavigate } from "react-router-dom";
-import NotificationMessage from "../components/NotificationMessage/NotificationMessage";
 
 function Login() {
     const [checked, setChecked] = useState(false); // Статус checkbox "Запам'ятати мене"
@@ -16,6 +20,7 @@ function Login() {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
+        role: "teacher"
     });
 
     const [errors, setErrors] = useState({});
@@ -86,7 +91,7 @@ function Login() {
                 const payload = {
                     email: formData.email,
                     password: formData.password,
-                    role: "teacher",
+                    role: formData.role || "teacher" // якщо порожнє, встановити "teacher"
                 };
 
                 console.log("Data being sent:", JSON.stringify(payload));
@@ -134,6 +139,12 @@ function Login() {
             <NotificationMessage message={notification.message} boolean={notification.boolean} />
             <form onSubmit={handleSubmit} className="w-full mx-auto rounded-[23px] pt-[50px] max-w-[695px] pb-[95px] bg-[#ffffff] flex flex-col justify-center">
                 <h1 className="text-[#141414] font-bold text-[32px] text-center mb-[61px]">Вхід</h1>
+                <ThemeToggle
+                    className="mx-auto mt-[45px] mb-[63px]"
+                    roleIsTeacher={formData.role === "teacher"} // передаємо статус вчителя/учня
+                    onRoleChange={(newRole) =>
+                        setFormData((prev) => ({ ...prev, role: newRole ? "teacher" : "student", languageLevelId: [], day: [] }))
+                    } />
                 <div className="pl-[52px] pr-[60px] gap-[25px] flex flex-col">
                     <Input
                         type="email"
