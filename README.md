@@ -11,8 +11,6 @@
 git clone https://github.com/aduvancik/english-platform.git
 ```
 
-<h3>Running the frontend</h3>
-
 ```
 cd modules
 ```
@@ -30,6 +28,22 @@ npm run dev
 ```
 
 <h3>Running the backend</h3>
+
+```
+cd ..
+```
+
+```
+cd backend
+```
+
+```
+npm install
+```
+
+```
+npm run dev
+```
 
 
 <h2>💖Like my work</h2>

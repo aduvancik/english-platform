@@ -4,6 +4,7 @@ import { teacherSchema } from "../utils/validationSchemas.js";
 
 export const createTeacher = async (req, res, next) => {
     try {
+        console.log(req.body);
         await teacherSchema.validate(req.body);
 
         const { firstName, lastName, email, password, languageLevelIds, timeSlotIds } = req.body;

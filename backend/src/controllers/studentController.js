@@ -29,7 +29,7 @@ export const createStudent = async (req, res, next) => {
 
         return res.status(201).json({ message: "Student created" });
     } catch (er) {
-        next (er);
+        next(er);
     }
 };
 
