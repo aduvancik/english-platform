@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+
+import LandingPage from "../pages/LandingPage";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import PrivateRoute from "../components/PrivateRoute";
-import LandingPage from "../pages/LandingPage";
 import { Dashboard } from "../components/Dashboard";
 import { StudentsList } from "../components/StudentsList/StudentsList";
 import { ProfilePage } from "../components/Profile";
