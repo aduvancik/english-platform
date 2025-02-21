@@ -6,9 +6,9 @@ import Register from "../pages/Register";
 import PrivateRoute from "../components/PrivateRoute/PrivateRoute";  // Розкоментовано
 import { Dashboard } from "../components/Dashboard";
 import { StudentsList } from "../components/StudentsList/StudentsList";
-import { ProfilePage } from "../components/Profile";
 import { Support } from "../components/Support";
 import Schedule from "../components/Schedule/Schedule";
+import { ProfilePage } from "../pages/Profile";
 
 const AppRoutes = () => {
     return (

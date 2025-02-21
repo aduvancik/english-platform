@@ -97,7 +97,7 @@ function Register() {
                 lastName: formData.lastName,
                 email: formData.email,
                 password: formData.password,
-                languageLevelIds: formData.languageLevelId,
+                languageLevelId: formData.languageLevelId,
                 timeSlotIds: formData.timeSlotIds
             }
             : {
@@ -105,7 +105,7 @@ function Register() {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
-                languageLevelIds: formData.languageLevelId[0],
+                languageLevelId: formData.languageLevelId[0],
                 password: formData.password,
                 studyGroupId: formData.studyGroupId,
                 timeSlotIds: formData.timeSlotIds,
@@ -148,8 +148,18 @@ function Register() {
 
     //закривання відкривання випадаючих списків
     const toggleDropdown = (key) => {
-        setDropdowns((prev) => ({ ...prev, [key]: !prev[key] }));
+        setDropdowns((prev) => {
+            const isCurrentlyOpen = prev[key];
+            return {
+                hours: false,
+                days: false,
+                level: false,
+                [key]: !isCurrentlyOpen, // Закриває, якщо натиснуто повторно
+            };
+        });
     };
+
+
 
     //функція для вибору рівня англійської
     const handleSelectLevel = useSelectLevel(formData, setFormData, setDropdowns, englishLevels);

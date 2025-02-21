@@ -6,7 +6,7 @@ export const validate = (formData, setErrors) => {
   if (formData.languageLevelId.length === 0) errors.languageLevelId = "Оберіть рівень англійської";
   if (formData.day.length === 0) errors.day = "Оберіть дні тижня";
   if (formData.hour.length === 0) errors.hour = "Оберіть години";
-  if (formData.password.length < 6) errors.password = "Пароль має бути мінімум 6 символів";
+  if (formData.password.length < 8) errors.password = "Пароль має бути мінімум 8 символів";
 
   setErrors(errors);
   return Object.keys(errors).length === 0;
