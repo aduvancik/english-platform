@@ -10,6 +10,7 @@
 ```
 git clone https://github.com/aduvancik/english-platform.git
 ```
+<h3>Running the frontend</h3>
 
 ```
 cd modules
