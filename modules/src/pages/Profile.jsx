@@ -8,9 +8,11 @@ import { handleSelectHour } from "../shared/utils/handleSelectHour";
 import { days, englishLevels, hours } from "../shared/constants/data";
 import { handleChange } from "../shared/utils/handleChange";
 import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
+import AddFile from "../components/AddFile/AddFile";
 
 export const ProfilePage = () => {
     const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
+    const [errors, setErrors] = useState({});
     const [dropdowns, setDropdowns] = useState({
         hours: false,
         days: false,
@@ -68,6 +70,7 @@ export const ProfilePage = () => {
     //функція при зміні даних в інпуті
     const onInputChange = (e) => handleChange(e, formData, setFormData, errors, setErrors, englishLevels, days, hours);
 
+
     //функція для вибору рівня англійської
     const handleSelectLevel = useSelectLevel(formData, setFormData, setDropdowns, englishLevels);
 
@@ -81,143 +84,182 @@ export const ProfilePage = () => {
     return (
         <div className="flex flex-col gap-[40px]">
             <h2 className="text-[40px]">Профіль</h2>
-            <div className="bg-white w-full py-[60px] px-[184px] flex">
-                <div className="max-w-[171px] w-full">
-                    <div className="max-w-[171px] w-full h-[214px] rounded-[15px] bg-[#EDEDED]"></div>
-                    <button className="flex gap-[8px] mt-[13px] items-center justify-center mx-auto">
-                        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M8.49992 3.1875C8.69552 3.1875 8.85409 3.34607 8.85409 3.54167V13.4583C8.85409 13.6539 8.69552 13.8125 8.49992 13.8125C8.30432 13.8125 8.14575 13.6539 8.14575 13.4583V3.54167C8.14575 3.34607 8.30432 3.1875 8.49992 3.1875Z" fill="#5B2BBA" />
-                            <path fillRule="evenodd" clipRule="evenodd" d="M3.1875 8.49992C3.1875 8.30432 3.34607 8.14575 3.54167 8.14575H13.4583C13.6539 8.14575 13.8125 8.30432 13.8125 8.49992C13.8125 8.69552 13.6539 8.85409 13.4583 8.85409H3.54167C3.34607 8.85409 3.1875 8.69552 3.1875 8.49992Z" fill="#5B2BBA" />
-                            <circle cx="8.5" cy="8.5" r="8" stroke="#5B2BBA" />
-                        </svg>
-                        <p>додати</p>
-                    </button>
-                </div>
-                <div>
-                    <div className="pl-[71px] pr-[41px] gap-[25px] flex flex-col">
-                        <Input
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={onInputChange}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Ім'я"
-                            error={isFormSubmitted && errors.firstName}
-                        />
-                        <Input
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={onInputChange}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Прізвище"
-                            error={isFormSubmitted && errors.lastName}
-                        />
-                        <Input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={onInputChange}
-                            onKeyDown={handleKeyDown}
-                            placeholder="Електронна пошта"
-                            error={isFormSubmitted && errors.email}
-                        />
-                        <div className="relative">
-                            <div
-                                className="w-full border-[#36B889] border-[1px] rounded-[15px] text-[20px] px-[10px] h-[60px] py-[14px] flex justify-between items-center cursor-pointer"
-                                onClick={() => toggleDropdown("level")}
-                            >
-                                <span>
-                                    {renderSelectedLevels(formData, englishLevels)}
+            <div className="bg-white w-full py-[60px] px-[184px]">
+                <div className="flex gap-[142px]">
 
-                                </span>
-
-                                <span className="text-xl">
-                                    <svg width="25" height="15" viewBox="0 0 25 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.3072 14.4746C11.6385 14.8249 12.0361 15 12.5 15C12.9639 15 13.3615 14.8249 13.6928 14.4746L24.503 3.07356C24.8343 2.72329 25 2.2986 25 1.79947C25 1.30035 24.8343 0.875657 24.503 0.525394C24.1716 0.175131 23.7699 0 23.2977 0C22.8255 0 22.4238 0.175131 22.0924 0.525394L12.5 10.6918L2.90755 0.525394C2.57621 0.175131 2.17445 0 1.70229 0C1.23012 0 0.828363 0.175131 0.497018 0.525394C0.165673 0.875657 0 1.30035 0 1.79947C0 2.2986 0.165673 2.72329 0.497018 3.07356L11.3072 14.4746ZM10.8101 9.64098V13.2137H14.1899V9.64098H10.8101Z" fill={formData.role === "teacher" ? "#5B2BBA" : "#E2379D"} />
-                                    </svg>
-                                </span>
+                    <div className="max-w-[171px] w-full">
+                        <div className="max-w-[171px] w-full h-[214px] rounded-[15px] bg-[#EDEDED]"></div>
+                        <AddFile text="додати" className="mx-auto mt-[13px]" />
+                    </div>
+                    <div>
+                        <div className="gap-[23px] flex w-[367px]">
+                            <div className="gap-[14px] flex flex-col items-end">
+                                <label htmlFor="firstName" className="text-[20px] leading-[35px]">імʼя</label>
+                                <label htmlFor="lastName" className="text-[20px] leading-[35px]">прізвище</label>
+                                <label htmlFor="email" className="text-[20px] leading-[35px] whitespace-nowrap">e-mail</label>
+                                <label htmlFor="firstName" className="text-[20px] leading-[35px]">рівень</label>
+                                <label htmlFor="firstName" className="text-[20px] leading-[35px]">обрані дні</label>
+                                <label htmlFor="firstName" className="text-[20px] leading-[35px] whitespace-nowrap">обрані години</label>
                             </div>
-                            {dropdowns.level && (
-                                <div className="absolute w-full h-[150px] overflow-y-scroll bg-white border-[#36B889] border-[1px] rounded-[15px] mt-1 z-10">
-                                    {Object.keys(englishLevels).map((level) => (
-                                        <div
-                                            key={level}
-                                            className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
-                                            onClick={() => handleSelectLevel(level)}
-                                        >
-                                            {level}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {isFormSubmitted && errors.languageLevelId && <span style={{ color: "red" }}>{errors.languageLevelId}</span>}
-                        </div>
-                        <div className="relative">
-                            <div
-                                className="w-full border-[#36B889] border-[1px] rounded-[15px] text-[20px] px-[10px] h-[60px] py-[14px] flex justify-between items-center cursor-pointer"
-                                onClick={() => toggleDropdown("days")}
-                            >
-                                <span>
-                                    <SelectedDays formData={formData} days={days} />
-                                </span>
+                            <div className="gap-[14px] flex flex-col w-[240px] min-w-[240px]">
+                                <Input
+                                    id="firstName"
+                                    type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={onInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Ім'я"
+                                    error={isFormSubmitted && errors.firstName}
+                                    className={"max-h-[35px] !text-[16px] !rounded-[6px]"}
+                                />
+                                <Input
+                                    id="lastName"
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={onInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Прізвище"
+                                    className={"max-h-[35px] !text-[16px] !rounded-[6px]"}
+                                    error={isFormSubmitted && errors.lastName}
+                                />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={onInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    className={"max-h-[35px] !text-[16px] !rounded-[6px]"}
+                                    placeholder="Електронна пошта"
+                                    error={isFormSubmitted && errors.email}
+                                />
+                                <div className="relative">
+                                    <div
+                                        className="w-full border-[#36B889] border-[1px] rounded-[6px] text-[16px] pr-[22px] pl-[10px] h-[35px] py-[14px] flex justify-between items-center cursor-pointer"
+                                        onClick={() => toggleDropdown("level")}
+                                    >
+                                        <span>
+                                            {renderSelectedLevels(formData, englishLevels)}
 
-                                <span className="text-xl">
-                                    <svg width="25" height="15" viewBox="0 0 25 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.3072 14.4746C11.6385 14.8249 12.0361 15 12.5 15C12.9639 15 13.3615 14.8249 13.6928 14.4746L24.503 3.07356C24.8343 2.72329 25 2.2986 25 1.79947C25 1.30035 24.8343 0.875657 24.503 0.525394C24.1716 0.175131 23.7699 0 23.2977 0C22.8255 0 22.4238 0.175131 22.0924 0.525394L12.5 10.6918L2.90755 0.525394C2.57621 0.175131 2.17445 0 1.70229 0C1.23012 0 0.828363 0.175131 0.497018 0.525394C0.165673 0.875657 0 1.30035 0 1.79947C0 2.2986 0.165673 2.72329 0.497018 3.07356L11.3072 14.4746ZM10.8101 9.64098V13.2137H14.1899V9.64098H10.8101Z" fill={formData.role === "teacher" ? "#5B2BBA" : "#E2379D"} />
-                                    </svg>
-                                </span>
-                            </div>
-                            {dropdowns.days && (
-                                <div className="absolute w-full h-[150px] overflow-y-scroll bg-white border-[#36B889] border-[1px] rounded-[15px] mt-1 z-10">
-                                    {Object.keys(days).map((day) => (
-                                        <div
-                                            key={day}
-                                            className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
-                                            onClick={() => onSelectDay(day)}
-                                        >
-                                            {day}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {isFormSubmitted && errors.day && <span style={{ color: "red" }}>{errors.day}</span>}
-                        </div>
-                        <div className="relative">
-                            <div
-                                className="w-full border-[#36B889] border-[1px] rounded-[15px] text-[20px] px-[10px] h-[60px] py-[14px] flex justify-between items-center cursor-pointer"
-                                onClick={() => toggleDropdown("hours")}
-                            >
-                                <span>
-                                    <SelectedHour formData={formData} hours={hours} />
-                                </span>
+                                        </span>
 
-                                <span className="text-xl">
-                                    <svg width="25" height="15" viewBox="0 0 25 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M11.3072 14.4746C11.6385 14.8249 12.0361 15 12.5 15C12.9639 15 13.3615 14.8249 13.6928 14.4746L24.503 3.07356C24.8343 2.72329 25 2.2986 25 1.79947C25 1.30035 24.8343 0.875657 24.503 0.525394C24.1716 0.175131 23.7699 0 23.2977 0C22.8255 0 22.4238 0.175131 22.0924 0.525394L12.5 10.6918L2.90755 0.525394C2.57621 0.175131 2.17445 0 1.70229 0C1.23012 0 0.828363 0.175131 0.497018 0.525394C0.165673 0.875657 0 1.30035 0 1.79947C0 2.2986 0.165673 2.72329 0.497018 3.07356L11.3072 14.4746ZM10.8101 9.64098V13.2137H14.1899V9.64098H10.8101Z" fill={formData.role === "teacher" ? "#5B2BBA" : "#E2379D"} />
-                                    </svg>
-                                </span>
-                            </div>
-                            {dropdowns.hours && (
-                                <div className="absolute w-full h-[150px] overflow-y-scroll bg-white border-[#36B889] border-[1px] rounded-[15px] mt-1 z-10">
-                                    {Object.keys(hours).map((hour) => (
-                                        <div
-                                            key={hour}
-                                            className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
-                                            onClick={() => onSelectHour(hour)}
-                                        >
-                                            {hour}
+                                        <span className="text-xl">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="10" viewBox="0 0 15 10" fill="none">
+                                                <path d="M6.66504 8.88916C6.86035 9.08447 7.09473 9.18213 7.36816 9.18213C7.6416 9.18213 7.87598 9.08447 8.07129 8.88916L14.4434 2.53174C14.6387 2.33643 14.7363 2.09961 14.7363 1.82129C14.7363 1.54297 14.6387 1.30615 14.4434 1.11084C14.248 0.915527 14.0112 0.817871 13.7329 0.817871C13.4546 0.817871 13.2178 0.915527 13.0225 1.11084L7.36816 6.77979L1.71387 1.11084C1.51855 0.915527 1.28174 0.817871 1.00342 0.817871C0.725098 0.817871 0.488281 0.915527 0.292969 1.11084C0.0976562 1.30615 0 1.54297 0 1.82129C0 2.09961 0.0976562 2.33643 0.292969 2.53174L6.66504 8.88916ZM6.37207 6.19385V8.18604H8.36426V6.19385H6.37207Z" fill="#5B2BBA" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    {dropdowns.level && (
+                                        <div className="absolute w-full h-[150px] overflow-y-scroll bg-white border-[#36B889] border-[1px] rounded-[15px] mt-1 z-10">
+                                            {Object.keys(englishLevels).map((level) => (
+                                                <div
+                                                    key={level}
+                                                    className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
+                                                    onClick={() => handleSelectLevel(level)}
+                                                >
+                                                    {level}
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
+                                    )}
+                                    {isFormSubmitted && errors.languageLevelId && <span style={{ color: "red" }}>{errors.languageLevelId}</span>}
+
                                 </div>
-                            )}
+                                <div className="relative">
+                                    <div
+                                        className="w-full border-[#36B889]  border-[1px] rounded-[6px] text-[16px] pr-[22px] pl-[10px] h-[35px] flex justify-between items-center cursor-pointer"
+                                        onClick={() => toggleDropdown("days")}
+                                    >
+                                        <span>
+                                            <SelectedDays formData={formData} days={days} />
+                                        </span>
+
+                                        <span className="text-xl">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="10" viewBox="0 0 15 10" fill="none">
+                                                <path d="M6.66504 8.88916C6.86035 9.08447 7.09473 9.18213 7.36816 9.18213C7.6416 9.18213 7.87598 9.08447 8.07129 8.88916L14.4434 2.53174C14.6387 2.33643 14.7363 2.09961 14.7363 1.82129C14.7363 1.54297 14.6387 1.30615 14.4434 1.11084C14.248 0.915527 14.0112 0.817871 13.7329 0.817871C13.4546 0.817871 13.2178 0.915527 13.0225 1.11084L7.36816 6.77979L1.71387 1.11084C1.51855 0.915527 1.28174 0.817871 1.00342 0.817871C0.725098 0.817871 0.488281 0.915527 0.292969 1.11084C0.0976562 1.30615 0 1.54297 0 1.82129C0 2.09961 0.0976562 2.33643 0.292969 2.53174L6.66504 8.88916ZM6.37207 6.19385V8.18604H8.36426V6.19385H6.37207Z" fill="#5B2BBA" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    {dropdowns.days && (
+                                        <div className="absolute w-full h-[150px] overflow-y-scroll bg-white border-[#36B889] border-[1px] rounded-[15px] mt-1 z-10">
+                                            {Object.keys(days).map((day) => (
+                                                <div
+                                                    key={day}
+                                                    className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
+                                                    onClick={() => onSelectDay(day)}
+                                                >
+                                                    {day}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {isFormSubmitted && errors.day && <span style={{ color: "red" }}>{errors.day}</span>}
+                                </div>
+
+                                <div className="relative">
+                                    <div
+                                        className="w-full border-[#36B889] overflow-x-auto border-[1px] rounded-[6px] text-[16px] pr-[22px] pl-[10px] h-[35px] flex justify-between items-center cursor-pointer"
+                                        onClick={() => toggleDropdown("hours")}
+                                    >
+                                        <span>
+                                            <SelectedHour formData={formData} hours={hours} />
+                                        </span>
+
+                                        <span className="text-xl">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="10" viewBox="0 0 15 10" fill="none">
+                                                <path d="M6.66504 8.88916C6.86035 9.08447 7.09473 9.18213 7.36816 9.18213C7.6416 9.18213 7.87598 9.08447 8.07129 8.88916L14.4434 2.53174C14.6387 2.33643 14.7363 2.09961 14.7363 1.82129C14.7363 1.54297 14.6387 1.30615 14.4434 1.11084C14.248 0.915527 14.0112 0.817871 13.7329 0.817871C13.4546 0.817871 13.2178 0.915527 13.0225 1.11084L7.36816 6.77979L1.71387 1.11084C1.51855 0.915527 1.28174 0.817871 1.00342 0.817871C0.725098 0.817871 0.488281 0.915527 0.292969 1.11084C0.0976562 1.30615 0 1.54297 0 1.82129C0 2.09961 0.0976562 2.33643 0.292969 2.53174L6.66504 8.88916ZM6.37207 6.19385V8.18604H8.36426V6.19385H6.37207Z" fill="#5B2BBA" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    {dropdowns.hours && (
+                                        <div className="absolute w-full h-[150px] overflow-y-scroll bg-white border-[#36B889] border-[1px] rounded-[6px] mt-1 z-10">
+                                            {Object.keys(hours).map((hour) => (
+                                                <div
+                                                    key={hour}
+                                                    className="px-[10px] py-[14px] cursor-pointer hover:bg-[#f0f0f0]"
+                                                    onClick={() => onSelectHour(hour)}
+                                                >
+                                                    {hour}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                            </div>
+
                             {isFormSubmitted && errors.hour && <span style={{ color: "red" }}>{errors.hour}</span>}
                         </div>
 
                     </div>
                 </div>
-            </div>
+                {formData.role === "teacher" &&
+                    <div className="mt-[81px]">
+                        <h3 className="text-[20px] mb-[10px]">Про себе:</h3>
+                        <Input
+                            className="rounded-[15px] h-[62px] px-[10px] py-[15px] text-[16px]"
+                            placeholder="написати"
+                        />
+                        <div className="mt-[45px] flex flex-col gap-[24px]">
+                            <div>
+                                <h3 className="text-[20px]">Освіта:</h3>
+                                <AddFile text="додати диплом" className="w-max" />
+                            </div>
+                            <div>
+                                <h3 className="text-[20px]">Досвід:</h3>
+                                <AddFile text="додати досвід" className="w-max" />
+                            </div>
+                            <div>
+                                <h3 className="text-[20px]">Сертифікати:</h3>
+                                <AddFile text="додати сертифікат" className="w-max" />
+                            </div>
 
-        </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div >
     )
 }
