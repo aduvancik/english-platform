@@ -84,6 +84,8 @@ function Register() {
 
 
     const handleSubmit = async (e) => {
+        console.log(formData);
+        
         e.preventDefault();
 
         setIsFormSubmitted(true);
@@ -97,7 +99,7 @@ function Register() {
                 lastName: formData.lastName,
                 email: formData.email,
                 password: formData.password,
-                languageLevelId: formData.languageLevelId,
+                languageLevelIds: formData.languageLevelId,
                 timeSlotIds: formData.timeSlotIds
             }
             : {
@@ -138,12 +140,12 @@ function Register() {
     const onInputChange = (e) => handleChange(e, formData, setFormData, errors, setErrors, englishLevels, days, hours);
 
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter" && !e.target.closest('.theme-toggle')) {
-            e.preventDefault();
-            handleSubmit(e); // Викликаємо обробник відправки
-        }
-    };
+        const handleKeyDown = (e) => {
+            if (e.key === "Enter" && !e.target.closest('.theme-toggle')) {
+                e.preventDefault();
+                handleSubmit(e); // Викликаємо обробник відправки
+            }
+        };
 
 
     //закривання відкривання випадаючих списків
