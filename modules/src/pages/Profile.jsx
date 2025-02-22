@@ -1,16 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+//style
+import { motion } from "framer-motion";
+//constans
+import { days, englishLevels, hours } from "../shared/constants/data";
+//components
 import Input from "../components/Input/Input";
+import AddFile from "../components/AddFile/AddFile";
 import SelectedDays from "../components/SelectedDays/SelectedDays";
 import SelectedHour from "../components/SelectedHour/SelectedHour";
-import useSelectLevel from "../shared/hooks/useSelectLevel";
+//function
+import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
 import { handleSelectDays } from "../shared/utils/handleSelectDays";
 import { handleSelectHour } from "../shared/utils/handleSelectHour";
-import { days, englishLevels, hours } from "../shared/constants/data";
 import { handleChange } from "../shared/utils/handleChange";
-import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
-import AddFile from "../components/AddFile/AddFile";
+//hooks
+import useSelectLevel from "../shared/hooks/useSelectLevel";
 
 export const ProfilePage = () => {
+    //useRef for files input
+    const fileInputCertificateRef = useRef(null);
+
+    //use state
     const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
     const [errors, setErrors] = useState({});
     const [dropdowns, setDropdowns] = useState({
@@ -28,8 +38,17 @@ export const ProfilePage = () => {
         timeSlotIds: [],
         password: "",
         role: "teacher",
-        studyGroupId: null
+        studyGroupId: null,
+        certificate: [],
+        diploma: [],
+        fotoProfile: [],
+        workExperience: ""
+
     });
+    const [showInput, setShowInput] = useState(false);
+
+
+    //функція для відкривання випадайки з годинами днями та левелом анг
     const toggleDropdown = (key) => {
         setDropdowns((prev) => {
             const isCurrentlyOpen = prev[key];
@@ -54,6 +73,10 @@ export const ProfilePage = () => {
             day: ["Monday Thursday"],
             timeSlotIds: [1],
             studyGroupId: 1,
+            certificate: [],
+            diploma: [],
+            fotoProfile: [],
+            workExperience: ""
         };
 
         setFormData(mockBackendData); // Simulate setting the data received from the backend
@@ -80,6 +103,44 @@ export const ProfilePage = () => {
 
     //функція для вибору годин
     const onSelectHour = (hour) => handleSelectHour(hour, hours, setFormData);
+
+    //files
+    const handleFileClick = (field) => {
+        if (fileInputCertificateRef.current) {
+            fileInputCertificateRef.current.click();
+        }
+    };
+
+
+    // Обробка зміни файлів
+    const handleFileChange = (event, field) => {
+        if (!event.target || !event.target.files) {
+            console.error("No files selected or event target is missing");
+            return;
+        }
+
+        const files = Array.from(event.target.files); // Array of selected files
+        setFormData(prev => {
+            const updatedFormData = {
+                ...prev,
+                [field]: [...(prev[field] || []), ...files] // Add new files to the field
+            };
+            console.log(updatedFormData.certificate); // Log immediately after state update
+            return updatedFormData;
+        });
+    };
+
+
+
+
+
+    // Функція для видалення файлів
+    const removeFile = (index, field) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: prev[field].filter((_, i) => i !== index) // Видаляємо файл з правильного поля
+        }));
+    };
 
     return (
         <div className="flex flex-col gap-[40px]">
@@ -244,18 +305,81 @@ export const ProfilePage = () => {
                         />
                         <div className="mt-[45px] flex flex-col gap-[24px]">
                             <div>
-                                <h3 className="text-[20px]">Освіта:</h3>
-                                <AddFile text="додати диплом" className="w-max" />
+                                <div onClick={handleFileClick}>
+                                    <h3 className="text-[20px]">Освіта:</h3>
+                                    <AddFile text="додати диплом" className="w-max" />
+                                    <input
+                                        type="file"
+                                        ref={fileInputCertificateRef}
+                                        className="hidden"
+                                        onChange={(e) => handleFileChange(e, "diploma")}
+                                        multiple
+                                    />
+                                </div>
+                                <ul className="list-none flex flex-col gap-[10px] mt-[15px]">
+                                    {formData.diploma?.map((file, index) => (
+                                        <li key={index}>
+                                            <a
+                                                href={URL.createObjectURL(file)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file.name}
+                                            </a>
+                                            <button onClick={() => removeFile(index, "diploma")}>❌</button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                            <div>
+                            <div onClick={() => setShowInput(prev => !prev)} className="cursor-pointer">
                                 <h3 className="text-[20px]">Досвід:</h3>
                                 <AddFile text="додати досвід" className="w-max" />
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20, height: 0 }}
+                                    animate={{ opacity: showInput ? 1 : 0, y: showInput ? 0 : 20, height: showInput ? "auto" : 0 }}
+                                    exit={{ opacity: 0, y: 20, height: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="overflow-hidden"
+                                >
+
+                                    {showInput && (
+                                        <Input
+                                            value={formData.experensive}
+                                            onChange={(e) => setFormData({ ...formData, experensive: e.target.value })}
+                                            placeholder="Введіть ваш досвід..."
+                                            className="w-full p-2 border rounded-lg resize-y min-h-[50px]"
+                                        />
+                                    )}
+                                </motion.div>
+
                             </div>
                             <div>
-                                <h3 className="text-[20px]">Сертифікати:</h3>
-                                <AddFile text="додати сертифікат" className="w-max" />
+                                <div onClick={handleFileClick}>
+                                    <h3 className="text-[20px]">Сертифікати:</h3>
+                                    <AddFile text="додати сертифікат" className="w-max" />
+                                    <input
+                                        type="file"
+                                        ref={fileInputCertificateRef}
+                                        className="hidden"
+                                        onChange={(e) => handleFileChange(e, "certificate")}
+                                        multiple
+                                    />
+                                </div>
+                                <ul className="list-none flex flex-col gap-[10px] mt-[15px]">
+                                    {formData.certificate?.map((file, index) => (
+                                        <li key={index}>
+                                            <a
+                                                href={URL.createObjectURL(file)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file.name}
+                                            </a>
+                                            <button onClick={() => removeFile(index, "certificate")}>❌</button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-
                         </div>
                     </div>
                 }
