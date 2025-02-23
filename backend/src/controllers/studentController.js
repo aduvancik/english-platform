@@ -37,10 +37,12 @@ export const createStudent = async (req, res, next) => {
 export const getStudentById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const student = await Student.findByPk(id, {
-            include: [LanguageLevel, StudyGroup],
-        });
+        const { fields } = req.query;
 
+        const attributes = fields ? fields.split(',') : undefined;
+
+        const student = await Student.findByPk(id, { attributes });
+        
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
         }
