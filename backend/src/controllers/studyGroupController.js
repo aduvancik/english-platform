@@ -1,4 +1,4 @@
-import { Teacher, LanguageLevel, StudyGroup } from "../models/index.js";
+import { Teacher, LanguageLevel, StudyGroup, Student, TimeSlot } from "../models/index.js";
 import { studyGroupSchema } from "../utils/validationSchemas.js";
 
 export const createStudyGroup = async (req, res, next) => {
@@ -40,7 +40,12 @@ export const getStudyGroupById = async (req, res, next) => {
 export const getStudyGroups = async (req, res, next) => {
     try {
         const studyGroups = await StudyGroup.findAll({
-            include: [Teacher, LanguageLevel],
+            include: [Teacher, LanguageLevel,
+                {
+                    model: TimeSlot,
+                    through: { attributes: [] },
+                },
+            ],
         });
 
         return res.status(200).json(studyGroups);
@@ -77,7 +82,7 @@ export const deleteStudyGroup = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        const deletedCount = StudyGroup.destroy({
+        const deletedCount = await StudyGroup.destroy({
             where: {
                 id,
             },

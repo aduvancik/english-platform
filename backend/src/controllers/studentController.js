@@ -1,4 +1,5 @@
-import { LanguageLevel, Student, StudyGroup } from "../models/index.js";
+import { Sequelize } from "sequelize";
+import { LanguageLevel, Student, StudyGroup, TimeSlot } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
 import { studentSchema } from "../utils/validationSchemas.js";
 
@@ -25,7 +26,7 @@ export const createStudent = async (req, res, next) => {
             languageLevelId,
             studyGroupId,
         });
-        student.addTimeSlots(timeSlotIds);
+        await student.addTimeSlots(timeSlotIds);
 
         return res.status(201).json({ message: "Student created" });
     } catch (er) {
@@ -53,7 +54,12 @@ export const getStudentById = async (req, res, next) => {
 export const getStudents = async (req, res, next) => {
     try {
         const students = await Student.findAll({
-            include: [LanguageLevel, StudyGroup],
+            include: [LanguageLevel, StudyGroup,
+                {
+                    model: TimeSlot,
+                    through: { attributes: [] },
+                },
+            ],
         });
 
         return res.status(200).json(students);

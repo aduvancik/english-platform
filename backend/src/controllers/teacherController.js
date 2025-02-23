@@ -1,4 +1,4 @@
-import { Teacher } from "../models/index.js";
+import { LanguageLevel, StudyGroup, Teacher, TimeSlot } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
 import { teacherSchema } from "../utils/validationSchemas.js";
 
@@ -84,7 +84,14 @@ export const updateTeacher = async (req, res, next) => {
 
 export const getAllTeachers = async (req, res, next) => {
     try {
-        const teachers = await Teacher.findAll();
+        const teachers = await Teacher.findAll({
+            include: [LanguageLevel, StudyGroup,
+                {
+                    model: TimeSlot,
+                    through: { attributes: [] },
+                },
+            ],
+        });
         return res.status(200).json(teachers);
     } catch (er) {
         next(er);
