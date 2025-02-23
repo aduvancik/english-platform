@@ -15,6 +15,8 @@ import { handleSelectHour } from "../shared/utils/handleSelectHour";
 import { handleChange } from "../shared/utils/handleChange";
 //hooks
 import useSelectLevel from "../shared/hooks/useSelectLevel";
+//api
+import { API_ROUTES } from "../shared/api/api-routes";
 
 export const ProfilePage = () => {
     //useRef for files input
@@ -51,6 +53,7 @@ export const ProfilePage = () => {
     });
     const [showInput, setShowInput] = useState(false);
     const [imagePreview, setImagePreview] = useState("");
+
 
     //функція для відкривання випадайки з годинами днями та левелом анг
     const toggleDropdown = (key) => {
@@ -96,6 +99,38 @@ export const ProfilePage = () => {
     }, []);
 
 
+    const getUserData = async () => {
+        try {
+          const token = localStorage.getItem('authToken');
+          
+          if (!token) {
+            console.error('No token found');
+            return;
+          }
+      
+          const response = await fetch(`http://localhost:4000${API_ROUTES.teachers}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+      
+          const data = await response.json();
+          console.log("Тут ви отримуєте дані користувача", data); // Тут ви отримуєте дані користувача
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      
+      getUserData();
+      
+
+
+
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && !e.target.closest('.theme-toggle')) {
             e.preventDefault();
@@ -125,7 +160,6 @@ export const ProfilePage = () => {
             fileInputRefs[field].current.click();
         }
     };
-
 
     // Обробка зміни файлів
     const handleFileChange = (event, field) => {
@@ -160,10 +194,6 @@ export const ProfilePage = () => {
         });
 
     };
-
-
-
-
 
     // Функція для видалення файлів
     const removeFile = (index, field) => {

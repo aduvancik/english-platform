@@ -85,7 +85,7 @@ function Register() {
 
     const handleSubmit = async (e) => {
         console.log(formData);
-        
+
         e.preventDefault();
 
         setIsFormSubmitted(true);
@@ -124,7 +124,7 @@ function Register() {
             }));
 
             // Можливо, ви хочете перенаправити користувача на іншу сторінку після реєстрації
-            navigate("/dashboard");
+            navigate("/login");
 
         } catch (error) {
             console.error("Error sending data:", error.response?.data || error.message);
@@ -140,12 +140,12 @@ function Register() {
     const onInputChange = (e) => handleChange(e, formData, setFormData, errors, setErrors, englishLevels, days, hours);
 
 
-        const handleKeyDown = (e) => {
-            if (e.key === "Enter" && !e.target.closest('.theme-toggle')) {
-                e.preventDefault();
-                handleSubmit(e); // Викликаємо обробник відправки
-            }
-        };
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && !e.target.closest('.theme-toggle')) {
+            e.preventDefault();
+            handleSubmit(e); // Викликаємо обробник відправки
+        }
+    };
 
 
     //закривання відкривання випадаючих списків
