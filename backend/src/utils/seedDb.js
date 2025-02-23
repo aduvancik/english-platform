@@ -1,7 +1,10 @@
 import {
-    sequelize, Student, Teacher, TimeSlot, LanguageLevel, StudyGroup,
-    Teacher_LanguageLevel, Teacher_TimeSlot, StudyGroup_TimeSlot, Student_TimeSlot,
+    sequelize, Student, Teacher, TimeSlot, LanguageLevel,
 } from "../models/index.js";
+import { readFile } from "node:fs/promises";
+
+const dataStudents = JSON.parse(await readFile("dataStudents.json"));
+const dataTeachers = JSON.parse(await readFile("dataTeachers.json"));
 
 export async function seedDatabase() {
     try {
@@ -18,69 +21,27 @@ export async function seedDatabase() {
             { name: "C2" },
         ]);
 
-        await Teacher.bulkCreate([
-            { firstName: "Alice", lastName: "Johnson", email: "alice@example.com", passwordHash: "d3f1e7fc3af52bba71087d77f0742aea" },
-            { firstName: "Bob", lastName: "Smith", email: "bob@example.com", passwordHash: "5eb013a824130939c986a2443515bf78" },
-            { firstName: "Julie", lastName: "Butler", email: "hgordon@example.com", passwordHash: "4c34fbc97ac1a9261653b1abc729b152" },
-            { firstName: "Gregg", lastName: "Roberts", email: "patrickrogers@example.com", passwordHash: "f87daacdbef28567dc430ea33601699e" },
-            { firstName: "Cynthia", lastName: "Fisher", email: "davidlee@example.com", passwordHash: "cb24ea5a69582dcc654c3bbb9027e6b5" },
-        ]);
-
-        await Teacher_LanguageLevel.bulkCreate([
-            { teacherId: 1, languageLevelId: 3 },
-            { teacherId: 1, languageLevelId: 4 },
-            { teacherId: 1, languageLevelId: 5 },
-            { teacherId: 2, languageLevelId: 1 },
-            { teacherId: 2, languageLevelId: 2 },
-        ]);
-
-        await StudyGroup.bulkCreate([
-            { teacherId: 1, languageLevelId: 4, name: "High Five" },
-            { teacherId: 1, languageLevelId: 5, name: "Avant Garde" },
-            { teacherId: 2, languageLevelId: 1, name: "Beginner Group A1" },
-            { teacherId: 2, languageLevelId: 2, name: "Beginner Group A2" },
-        ]);
-
-        await Student.bulkCreate([
-            { languageLevelId: 1, studyGroupId: 1, firstName: "Oleksandr", lastName: "Salah", email: "regeln@example.com", passwordHash: "6427435774b539b7eb87924b92d5d417" },
-            { languageLevelId: 2, studyGroupId: 3, firstName: "Sofia", lastName: "Hopp", email: "sofa@example.com", passwordHash: "hashed_password" },
-            { languageLevelId: 3, studyGroupId: 1, firstName: "oleg", lastName: "Krivogub", email: "oleg.doe@example.com", passwordHash: "6427435774b539b7eb87924b92d5d417" },
-            { languageLevelId: 3, studyGroupId: 3, firstName: "Solomiia", lastName: "Kava", email: "solomiia@example.com", passwordHash: "my_hashed_password" },
-            { languageLevelId: 4, studyGroupId: 3, firstName: "Yurii", lastName: "Nagorniak", email: "nagorniak@example.com", passwordHash: "dc647eb65e6711e155375218212b3964" },
-            { languageLevelId: 4, studyGroupId: 1, firstName: "Anastasiia", lastName: "Klishch", email: "anastasiia@example.com", passwordHash: "hashed_password" },
-        ]);
-
         await TimeSlot.bulkCreate(generateTimeSlotData());
 
-        await Teacher_TimeSlot.bulkCreate([
-            { teacherId: 1, timeSlotId: 34 },
-            { teacherId: 1, timeSlotId: 46 },
-            { teacherId: 1, timeSlotId: 58 },
-            { teacherId: 1, timeSlotId: 66 },
-            { teacherId: 2, timeSlotId: 10 },
-            { teacherId: 2, timeSlotId: 37 },
-            { teacherId: 2, timeSlotId: 76 },
-            { teacherId: 2, timeSlotId: 80 },
-        ]);
+        const teachers = await Teacher.bulkCreate(dataTeachers);
 
-        await StudyGroup_TimeSlot.bulkCreate([
-            { studyGroupId: 1, timeSlotId: 34 },
-            { studyGroupId: 1, timeSlotId: 46 },
-            { studyGroupId: 1, timeSlotId: 58 },
-            { studyGroupId: 2, timeSlotId: 66 },
-            { studyGroupId: 3, timeSlotId: 10 },
-            { studyGroupId: 3, timeSlotId: 80 },
-            { studyGroupId: 4, timeSlotId: 37 },
-        ]);
+        for (let i = 0; i < teachers.length / 2; ++i) {
+            if (i % 3 === 0) {
+                await teachers[i].addLanguageLevels([1]);
+            }
+            await teachers[i].addLanguageLevels([1, 2, 3]);
+            await teachers[i].addTimeSlots(getRandomTimeSlotIds({ size: 60 }));
+        }
+        for (let i = teachers.length / 2; i < teachers.length; ++i) {
+            await teachers[i].addLanguageLevels([4, 5, 6]);
+            await teachers[i].addTimeSlots(getRandomTimeSlotIds({ size: 60 }));
+        }
 
-        await Student_TimeSlot.bulkCreate([
-            { studentId: 1, timeSlotId: 10 },
-            { studentId: 1, timeSlotId: 20 },
-            { studentId: 1, timeSlotId: 30 },
-            { studentId: 1, timeSlotId: 34 },
-            { studentId: 1, timeSlotId: 54 },
-            { studentId: 1, timeSlotId: 66 },
-        ]);
+        const students = await Student.bulkCreate(dataStudents);
+
+        for (let i = 0; i < students.length; ++i) {
+            await students[i].addTimeSlots(getRandomTimeSlotIds({ size: 1 }));
+        }
     } catch (er) {
         console.log(`Error: ${er}`);
     }
@@ -114,4 +75,10 @@ function generateTimeSlotData() {
     }
 
     return timeSlots;
+}
+
+function getRandomTimeSlotIds({ size }) {
+    const availableNumbers = Array.from({ length: 168 }, (_, i) => i + 1);
+    const shuffled = availableNumbers.sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, size);
 }
