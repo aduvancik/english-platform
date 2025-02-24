@@ -25,11 +25,14 @@ export const createTeacher = async (req, res, next) => {
         next(er);
     }
 };
-
 export const getTeacherById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const teacher = await Teacher.findByPk(id);
+        const { fields } = req.query;
+        
+        const attributes = fields ? fields.split(',') : undefined;
+        
+        const teacher = await Teacher.findByPk(id, { attributes });
 
         if (!teacher) {
             return res.status(404).json({ message: "Teacher not found" });
