@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -7,47 +6,62 @@ import interactionPlugin from "@fullcalendar/interaction";
 
 import CalendarModal from "../CalendarModal/CalendarModal";
 import { API_ROUTES } from "../../shared/api/api-routes";
+import api from "../../api/api";
 
 import "../Calendar/Calendar.css";
+
+import schedule from "./groups.json";
 
 const Calendar = () => {
   const [openModal, setOpenModal] = useState(false);
   const [groups, setGroups] = useState([]);
   const [students, setStudents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [events, setEvents] = useState([
-    { id: "1", title: "High Five", start: "2025-02-17T12:00:00+02:00" },
-    { id: "2", title: "Golden Eagles", start: "2025-02-17T17:00:00" },
-    { id: "3", title: "Crazy Frogs", start: "2025-02-18T14:00:00" },
-    { id: "5", title: "Bright Stars", start: "2025-02-19T16:00:00" },
-    { id: "7", title: "High Five", start: "2025-02-20T12:00:00" },
-    { id: "8", title: "Golden Eagles", start: "2025-02-20T17:00:00" },
-    { id: "9", title: "Crazy Frogs", start: "2025-02-21T14:00:00" },
-    { id: "11", title: "Bright Stars", start: "2025-02-22T16:00:00" },
-  ]);
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: studentsData } = await axios.get(
-        `http://localhost:4000${API_ROUTES.students}`
-      );
+      const { data: studentsData } = await api.get(API_ROUTES.students);
       setStudents(studentsData);
-      const { data } = await axios.get(
-        `http://localhost:4000${API_ROUTES.groups}`
-      );
+      const { data } = await api.get(API_ROUTES.groups);
       setGroups(data);
       console.log(studentsData, data);
     };
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const calendarEvents = schedule.flatMap((group) =>
+      group.schedule.map((schedule) => ({
+        title: group.name,
+        start: schedule.date,
+        id: group.id,
+      }))
+    );
+    setEvents(calendarEvents);
+  }, []);
+
   const handleEventClick = (clickInfo) => {
+    const localTime = new Date(clickInfo.event.start).toLocaleString();
+    console.log("Локальний час:", localTime);
     setSelectedEvent(clickInfo.event);
+    const lesson = schedule.find(
+      (group) => group.id == clickInfo.event?._def.publicId
+    );
+    setCurrentLesson(lesson);
     setOpenModal(true);
-    // console.log(clickInfo.event);
+    console.log(lesson);
   };
 
-  const handleCloseModal = () => setOpenModal(false);
+  const handleSaveEvent = (updatedEvent) => {
+    // Оновлення івенту в стані events
+    const updatedEvents = events.map((event) =>
+      event.id === updatedEvent.id ? updatedEvent : event
+    );
+    setEvents(updatedEvents);
+    setSelectedEvent(null);
+  };
 
   return (
     <div className="">
@@ -55,11 +69,13 @@ const Calendar = () => {
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
+        timeZone="local"
         viewClassNames="h-[582px] p-[24px] bg-white shadow-lg rounded-xl"
         slotMinTime="12:00:00"
         slotMaxTime="18:00:00"
         slotDuration="00:20"
         slotLabelInterval="01:00"
+        droppable={false}
         editable={true}
         events={events}
         eventClick={handleEventClick}
@@ -72,8 +88,10 @@ const Calendar = () => {
       />
       <CalendarModal
         selectedEvent={selectedEvent}
+        lesson={currentLesson}
         openModal={openModal}
-        onClose={handleCloseModal}
+        onClose={() => setOpenModal(false)}
+        onSave={handleSaveEvent}
       ></CalendarModal>
     </div>
   );

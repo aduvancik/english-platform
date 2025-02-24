@@ -17,14 +17,15 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      <Route path="/dashboard" element={<Dashboard />}>
-        <Route index element={<Navigate to="groups" replace />} />
-        <Route path="groups" element={<StudentsList />} />
-        <Route path="schedule" element={<Schedule />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="support" element={<Support />} />
+      <Route element={<PrivateRoute />}>
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route index element={<Navigate to="groups" replace />} />
+          <Route path="groups" element={<StudentsList />} />
+          <Route path="schedule" element={<Schedule />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="support" element={<Support />} />
+        </Route>
       </Route>
-      <Route element={<PrivateRoute />}></Route>
     </Routes>
   );
 };
