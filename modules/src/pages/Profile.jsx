@@ -1,16 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+//style
+import { motion } from "framer-motion";
+//constans
+import { days, englishLevels, hours } from "../shared/constants/data";
+//components
 import Input from "../components/Input/Input";
+import AddFile from "../components/AddFile/AddFile";
 import SelectedDays from "../components/SelectedDays/SelectedDays";
 import SelectedHour from "../components/SelectedHour/SelectedHour";
-import useSelectLevel from "../shared/hooks/useSelectLevel";
+//function
+import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
 import { handleSelectDays } from "../shared/utils/handleSelectDays";
 import { handleSelectHour } from "../shared/utils/handleSelectHour";
-import { days, englishLevels, hours } from "../shared/constants/data";
 import { handleChange } from "../shared/utils/handleChange";
-import { renderSelectedLevels } from "../components/renderSelectedLevels/renderSelectedLevels";
-import AddFile from "../components/AddFile/AddFile";
+//hooks
+import useSelectLevel from "../shared/hooks/useSelectLevel";
+//api
+import { API_ROUTES } from "../shared/api/api-routes";
 
 export const ProfilePage = () => {
+    //useRef for files input
+    const fileInputRefs = {
+        fotoProfile: useRef(null),
+        certificate: useRef(null),
+        diploma: useRef(null),
+    };
+    //use state
     const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
     const [errors, setErrors] = useState({});
     const [dropdowns, setDropdowns] = useState({
@@ -28,8 +43,19 @@ export const ProfilePage = () => {
         timeSlotIds: [],
         password: "",
         role: "teacher",
-        studyGroupId: null
+        studyGroupId: null,
+        certificate: [],
+        diploma: [],
+        fotoProfile: "",
+        workExperience: "",
+        aboutMe: ""
+
     });
+    const [showInput, setShowInput] = useState(false);
+    const [imagePreview, setImagePreview] = useState("");
+
+
+    //функція для відкривання випадайки з годинами днями та левелом анг
     const toggleDropdown = (key) => {
         setDropdowns((prev) => {
             const isCurrentlyOpen = prev[key];
@@ -43,6 +69,14 @@ export const ProfilePage = () => {
     };
 
     useEffect(() => {
+        if (formData.fotoProfile instanceof File) {
+            const objectUrl = URL.createObjectURL(formData.fotoProfile);
+            setImagePreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl); // Очищення URL після оновлення
+        }
+    }, [formData.fotoProfile]);
+
+    useEffect(() => {
         // Simulating receiving data from the backend
         const mockBackendData = {
             firstName: "John",
@@ -54,10 +88,47 @@ export const ProfilePage = () => {
             day: ["Monday Thursday"],
             timeSlotIds: [1],
             studyGroupId: 1,
+            certificate: [],
+            diploma: [],
+            fotoProfile: "",
+            workExperience: "",
+            aboutMe: ""
         };
 
         setFormData(mockBackendData); // Simulate setting the data received from the backend
     }, []);
+
+
+    const getUserData = async () => {
+        try {
+          const token = localStorage.getItem('authToken');
+          
+          if (!token) {
+            console.error('No token found');
+            return;
+          }
+      
+          const response = await fetch(`http://localhost:4000${API_ROUTES.teachers}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+      
+          const data = await response.json();
+          console.log("Тут ви отримуєте дані користувача", data); // Тут ви отримуєте дані користувача
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      
+      getUserData();
+      
+
 
 
     const handleKeyDown = (e) => {
@@ -81,6 +152,65 @@ export const ProfilePage = () => {
     //функція для вибору годин
     const onSelectHour = (hour) => handleSelectHour(hour, hours, setFormData);
 
+    //files
+    const handleFileClick = (field) => {
+        console.log("formData", formData);
+
+        if (fileInputRefs[field]?.current) {
+            fileInputRefs[field].current.click();
+        }
+    };
+
+    // Обробка зміни файлів
+    const handleFileChange = (event, field) => {
+        console.log("formData.fotoProfile", formData.fotoProfile);
+        // console.log("event", event);
+
+        if (!event.target || !event.target.files) {
+            console.error("No files selected or event target is missing");
+            return;
+        }
+
+        if (field === "fotoProfile") {
+            const file = event.target.files[0];
+            if (file) {
+                setFormData((prev) => ({
+                    ...prev,
+                    fotoProfile: file, // Зберігаємо сам файл
+                }));
+            }
+            return
+        }
+
+        const files = Array.from(event.target.files); // Array of selected files
+        console.log(field, "field");
+
+        setFormData(prev => {
+            const updatedFormData = {
+                ...prev,
+                [field]: [...(prev[field] || []), ...files] // Add new files to the field
+            };
+            return updatedFormData;
+        });
+
+    };
+
+    // Функція для видалення файлів
+    const removeFile = (index, field) => {
+        if (field === "fotoProfile") {
+            setFormData(prev => ({
+                ...prev,
+                [field]: "" // Просто очищаємо фото
+            }));
+            setImagePreview(""); // Очищаємо прев'ю
+            return;
+        }
+        setFormData(prev => ({
+            ...prev,
+            [field]: prev[field].filter((_, i) => i !== index) // Видаляємо файл з правильного поля
+        }));
+    };
+
     return (
         <div className="flex flex-col gap-[40px]">
             <h2 className="text-[40px]">Профіль</h2>
@@ -88,8 +218,42 @@ export const ProfilePage = () => {
                 <div className="flex gap-[142px]">
 
                     <div className="max-w-[171px] w-full">
-                        <div className="max-w-[171px] w-full h-[214px] rounded-[15px] bg-[#EDEDED]"></div>
-                        <AddFile text="додати" className="mx-auto mt-[13px]" />
+                        <div
+                            className="relative max-w-[171px] w-full h-[214px] rounded-[15px] bg-[#EDEDED] 
+                   flex items-center justify-center overflow-hidden group"
+                        >
+                            {formData.fotoProfile ? (
+                                <>
+                                    <img
+                                        src={imagePreview}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-[15px]"
+                                    />
+                                    <button
+                                        onClick={() => removeFile(0, "fotoProfile")}
+                                        className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 
+                         group-hover:opacity-100 transition-opacity duration-200"
+                                    >
+                                        ❌
+                                    </button>
+                                </>
+                            ) : (
+                                <p className="text-gray-500">Фото</p>
+                            )}
+                        </div>
+                        <div>
+                            <div onClick={() => handleFileClick("fotoProfile")}>
+                                <AddFile text="додати" className="w-max mx-auto mt-[13px]" />
+                                <input
+                                    type="file"
+                                    ref={fileInputRefs.fotoProfile}
+                                    className="hidden"
+                                    onChange={(e) => handleFileChange(e, "fotoProfile")}
+                                    accept="image/*"
+                                />
+                            </div>
+
+                        </div>
                     </div>
                     <div>
                         <div className="gap-[23px] flex w-[367px]">
@@ -241,21 +405,85 @@ export const ProfilePage = () => {
                         <Input
                             className="rounded-[15px] h-[62px] px-[10px] py-[15px] text-[16px]"
                             placeholder="написати"
+                            onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })}
                         />
                         <div className="mt-[45px] flex flex-col gap-[24px]">
                             <div>
-                                <h3 className="text-[20px]">Освіта:</h3>
-                                <AddFile text="додати диплом" className="w-max" />
+                                <div onClick={() => handleFileClick("diploma")}>
+                                    <h3 className="text-[20px]">Освіта:</h3>
+                                    <AddFile text="додати диплом" className="w-max" />
+                                    <input
+                                        type="file"
+                                        ref={fileInputRefs.diploma}
+                                        className="hidden"
+                                        onChange={(e) => handleFileChange(e, "diploma")}
+                                        multiple
+                                    />
+                                </div>
+                                <ul className="list-none flex flex-col gap-[10px] mt-[15px]">
+                                    {formData.diploma?.map((file, index) => (
+                                        <li key={index}>
+                                            <a
+                                                href={URL.createObjectURL(file)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file.name}
+                                            </a>
+                                            <button onClick={() => removeFile(index, "diploma")}>❌</button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                            <div>
+                            <div onClick={() => setShowInput(prev => !prev)} className="cursor-pointer">
                                 <h3 className="text-[20px]">Досвід:</h3>
                                 <AddFile text="додати досвід" className="w-max" />
-                            </div>
-                            <div>
-                                <h3 className="text-[20px]">Сертифікати:</h3>
-                                <AddFile text="додати сертифікат" className="w-max" />
-                            </div>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20, height: 0 }}
+                                    animate={{ opacity: showInput ? 1 : 0, y: showInput ? 0 : 20, height: showInput ? "auto" : 0 }}
+                                    exit={{ opacity: 0, y: 20, height: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="overflow-hidden"
+                                >
 
+                                </motion.div>
+
+                            </div>
+                            {showInput && (
+                                <Input
+                                    value={formData.experensive}
+                                    onChange={(e) => setFormData({ ...formData, experensive: e.target.value })}
+                                    placeholder="Введіть ваш досвід..."
+                                    className="w-full p-2 border rounded-lg resize-y min-h-[50px]"
+                                />
+                            )}
+                            <div>
+                                <div onClick={() => handleFileClick("certificate")}>
+                                    <h3 className="text-[20px]">Сертифікати:</h3>
+                                    <AddFile text="додати сертифікат" className="w-max" />
+                                    <input
+                                        type="file"
+                                        ref={fileInputRefs.certificate}
+                                        className="hidden"
+                                        onChange={(e) => handleFileChange(e, "certificate")}
+                                        multiple
+                                    />
+                                </div>
+                                <ul className="list-none flex flex-col gap-[10px] mt-[15px]">
+                                    {formData.certificate?.map((file, index) => (
+                                        <li key={index}>
+                                            <a
+                                                href={URL.createObjectURL(file)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file.name}
+                                            </a>
+                                            <button onClick={() => removeFile(index, "certificate")}>❌</button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 }
