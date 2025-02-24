@@ -6,7 +6,6 @@ import Register from "../pages/Register";
 import PrivateRoute from "../components/PrivateRoute/PrivateRoute";  // Розкоментовано
 import { Dashboard } from "../components/Dashboard";
 import { StudentsList } from "../components/StudentsList/StudentsList";
-import { Support } from "../components/Support";
 import Schedule from "../components/Schedule/Schedule";
 import { ProfilePage } from "../pages/Profile";
 
@@ -19,11 +18,10 @@ const AppRoutes = () => {
 
             <Route element={<PrivateRoute />}>
                 <Route path="/dashboard" element={<Dashboard />}>
-                    <Route index element={<Navigate to="groups" replace />} />
-                    <Route path="groups" element={<StudentsList />} />
-                    <Route path="schedule" element={<Schedule />} />
+                    <Route index element={<Navigate to="profile" replace />} />
                     <Route path="profile" element={<ProfilePage />} />
-                    <Route path="support" element={<Support />} />
+                    <Route path="schedule" element={<Schedule />} />
+                    <Route path="groups" element={<StudentsList />} />
                 </Route>
             </Route>
         </Routes>
