@@ -54,6 +54,29 @@ export const getTeacherById = async (req, res, next) => {
     }
 };
 
+export const getTeacherStudyGroups = async (req, res, next) => {
+    try {
+        const teacherId = req.user.id;
+
+        const studyGroups = await StudyGroup.findAll(
+            {
+                attributes: { exclude: ["teacherId", "languageLevelId"] },
+                where: { teacherId },
+                include: [LanguageLevel,
+                    {
+                        model: TimeSlot,
+                        through: { attributes: [] },
+                    },
+                ],
+            },
+        );
+
+        return res.status(200).json(studyGroups);
+    } catch (er) {
+        next(er);
+    }
+};
+
 export const deleteTeacher = async (req, res, next) => {
     try {
         const { id } = req.params;
