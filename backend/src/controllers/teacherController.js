@@ -25,17 +25,53 @@ export const createTeacher = async (req, res, next) => {
         next(er);
     }
 };
-
 export const getTeacherById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const teacher = await Teacher.findByPk(id);
+        const { fields } = req.query;
+
+        const attributes = fields ? fields.split(",") : undefined;
+
+        const teacher = await Teacher.findByPk(id,
+            {
+                attributes,
+                include: [LanguageLevel, StudyGroup,
+                    {
+                        model: TimeSlot,
+                        through: { attributes: [] },
+                    },
+                ],
+            },
+        );
 
         if (!teacher) {
             return res.status(404).json({ message: "Teacher not found" });
         }
 
         return res.status(200).json(teacher);
+    } catch (er) {
+        next(er);
+    }
+};
+
+export const getTeacherStudyGroups = async (req, res, next) => {
+    try {
+        const teacherId = req.user.id;
+
+        const studyGroups = await StudyGroup.findAll(
+            {
+                attributes: { exclude: ["teacherId", "languageLevelId"] },
+                where: { teacherId },
+                include: [LanguageLevel,
+                    {
+                        model: TimeSlot,
+                        through: { attributes: [] },
+                    },
+                ],
+            },
+        );
+
+        return res.status(200).json(studyGroups);
     } catch (er) {
         next(er);
     }

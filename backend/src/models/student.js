@@ -9,9 +9,11 @@ export class Student extends Model {
 
         values.languageLevel = values.LanguageLevel;
         values.studyGroup = values.StudyGroup;
+        values.timeSlots = values.TimeSlots;
 
         delete values.LanguageLevel;
         delete values.StudyGroup;
+        delete values.TimeSlots;
 
         return values;
     }
@@ -55,6 +57,7 @@ Student.init(
                 model: StudyGroup,
                 key: "id",
             },
+            onDelete: "SET NULL",
         },
     },
     {

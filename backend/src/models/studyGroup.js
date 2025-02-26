@@ -9,9 +9,11 @@ export class StudyGroup extends Model {
 
         values.teacher = values.Teacher;
         values.languageLevel = values.LanguageLevel;
+        values.timeSlots = values.TimeSlots;
 
         delete values.Teacher;
         delete values.LanguageLevel;
+        delete values.TimeSlots;
 
         return values;
     }

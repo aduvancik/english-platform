@@ -1,11 +1,10 @@
-import { Sequelize } from "sequelize";
 import { LanguageLevel, Student, StudyGroup, TimeSlot } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
-import { studentSchema } from "../utils/validationSchemas.js";
+import { createStudentSchema, patchStudentSchema } from "../utils/validationSchemas.js";
 
 export const createStudent = async (req, res, next) => {
     try {
-        await studentSchema.validate(req.body);
+        await createStudentSchema.validate(req.body);
 
         const {
             firstName,
@@ -37,9 +36,21 @@ export const createStudent = async (req, res, next) => {
 export const getStudentById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const student = await Student.findByPk(id, {
-            include: [LanguageLevel, StudyGroup],
-        });
+        const { fields } = req.query;
+
+        const attributes = fields ? fields.split(",") : undefined;
+
+        const student = await Student.findByPk(id,
+            {
+                attributes,
+                include: [LanguageLevel, StudyGroup,
+                    {
+                        model: TimeSlot,
+                        through: { attributes: [] },
+                    },
+                ],
+            },
+        );
 
         if (!student) {
             return res.status(404).json({ message: "Student not found" });
@@ -68,6 +79,30 @@ export const getStudents = async (req, res, next) => {
     }
 };
 
+export const patchStudent = async (req, res, next) => {
+    try {
+        await patchStudentSchema.validate(req.body);
+
+        const data = req.body;
+        const { id } = req.params;
+
+        const [updatedCount] = await Student.update(
+            data,
+            {
+                where: { id },
+            },
+        );
+
+        if (!updatedCount) {
+            return res.status(204).send();
+        }
+
+        return res.status(200).json({ message: "Student updated" });
+    } catch (er) {
+        next(er);
+    }
+};
+
 export const updateStudent = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -76,7 +111,7 @@ export const updateStudent = async (req, res, next) => {
         const student = await Student.findByPk(id);
 
         if (!student) {
-            return res.status(404).json({ message: "Teacher not found" });
+            return res.status(404).json({ message: "Student not found" });
         }
 
         student.firstName = firstName || student.firstName;
