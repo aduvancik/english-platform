@@ -1,7 +1,21 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../db/index.js";
 
-export class Teacher extends Model {}
+export class Teacher extends Model {
+    toJSON() {
+        const values = { ...this.get() };
+
+        values.languageLevels = values.LanguageLevels;
+        values.studyGroups = values.StudyGroups;
+        values.timeSlots = values.TimeSlots;
+
+        delete values.LanguageLevels;
+        delete values.StudyGroups;
+        delete values.TimeSlots;
+
+        return values;
+    }
+}
 
 Teacher.init(
     {

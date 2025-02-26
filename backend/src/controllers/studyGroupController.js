@@ -1,4 +1,4 @@
-import { Teacher, LanguageLevel, StudyGroup, Student, TimeSlot, sequelize } from "../models/index.js";
+import { Teacher, LanguageLevel, StudyGroup, Student, TimeSlot } from "../models/index.js";
 import { studyGroupSchema } from "../utils/validationSchemas.js";
 
 export const createStudyGroup = async (req, res, next) => {
@@ -24,7 +24,12 @@ export const getStudyGroupById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const studyGroup = await StudyGroup.findByPk(id, {
-            include: [Teacher, LanguageLevel],
+            include: [Teacher, LanguageLevel,
+                {
+                    model: TimeSlot,
+                    through: { attributes: [] },
+                },
+            ],
         });
 
         if (!studyGroup) {
@@ -115,9 +120,7 @@ export const generateStudyGroups = async (req, res, next) => {
             }],
         });
 
-        await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
-        await StudyGroup.truncate();
-        await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
+        await StudyGroup.destroy({ where: {} });
 
         let count = 0;
         for (const teacher of teachers) {
