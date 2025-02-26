@@ -55,6 +55,7 @@ Student.init(
                 model: StudyGroup,
                 key: "id",
             },
+            onDelete: "SET NULL",
         },
     },
     {
