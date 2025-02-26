@@ -83,17 +83,18 @@ export const patchStudent = async (req, res, next) => {
     try {
         await patchStudentSchema.validate(req.body);
 
+        const data = req.body;
         const { id } = req.params;
 
         const [updatedCount] = await Student.update(
-            req.body,
+            data,
             {
                 where: { id },
             },
         );
 
         if (!updatedCount) {
-            return res.status(204).json({ message: "No students were updated" });
+            return res.status(204).send();
         }
 
         return res.status(200).json({ message: "Student updated" });
