@@ -32,7 +32,17 @@ export const getTeacherById = async (req, res, next) => {
 
         const attributes = fields ? fields.split(",") : undefined;
 
-        const teacher = await Teacher.findByPk(id, { attributes });
+        const teacher = await Teacher.findByPk(id,
+            {
+                attributes,
+                include: [LanguageLevel, StudyGroup,
+                    {
+                        model: TimeSlot,
+                        through: { attributes: [] },
+                    },
+                ],
+            },
+        );
 
         if (!teacher) {
             return res.status(404).json({ message: "Teacher not found" });

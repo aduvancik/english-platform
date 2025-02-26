@@ -24,7 +24,12 @@ export const getStudyGroupById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const studyGroup = await StudyGroup.findByPk(id, {
-            include: [Teacher, LanguageLevel],
+            include: [Teacher, LanguageLevel,
+                {
+                    model: TimeSlot,
+                    through: { attributes: [] },
+                },
+            ],
         });
 
         if (!studyGroup) {

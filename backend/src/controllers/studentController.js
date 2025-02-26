@@ -43,7 +43,12 @@ export const getStudentById = async (req, res, next) => {
         const student = await Student.findByPk(id,
             {
                 attributes,
-                include: [LanguageLevel, StudyGroup],
+                include: [LanguageLevel, StudyGroup,
+                    {
+                        model: TimeSlot,
+                        through: { attributes: [] },
+                    },
+                ],
             },
         );
 
