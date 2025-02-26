@@ -1,0 +1,1 @@
+export { GroupInfoModal } from "./GroupInfoModal.jsx";

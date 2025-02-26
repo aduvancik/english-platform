@@ -1,10 +1,17 @@
-import { LabelledAddUserButton, RemoveUserButton } from "../../shared/ui";
-import { ModalButton } from "../../shared/ui";
+import { useState } from "react";
+import { LabelledAddUserButton, RemoveUserButton } from "../../../shared/ui";
+import { ModalButton } from "../../../shared/ui";
+import "./custom.css";
 
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 
 export const GroupInfoModal = ({ openModal, handleCloseModal, group }) => {
+    const [showTimeSlots, setShowTimeSlots] = useState(false);
+    const toggleTimeSlots = () => {
+        setShowTimeSlots((prev) => !prev);
+    }
+
     return (
         <Modal
             open={openModal}
@@ -12,7 +19,7 @@ export const GroupInfoModal = ({ openModal, handleCloseModal, group }) => {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Box className="absolute top-[50%] left-[50%] w-[450px] -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-5">
+            <Box className="group-info-modal absolute top-[50%] left-[50%] w-[450px] max-h-[70%] -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-5 overflow-auto">
                 {group ? (
                     <>
                         <div className="text-center">
@@ -21,7 +28,22 @@ export const GroupInfoModal = ({ openModal, handleCloseModal, group }) => {
                         </div>
 
                         <div className="text-center my-3">
-                            {group.timeSlots ? <div></div> : "Розклад відсутній"}
+                            {group.TimeSlots ? (
+                                <div>
+                                    <ModalButton handleClick={toggleTimeSlots}>{showTimeSlots ? "Заховати" : "Показати"} розклад</ModalButton>
+                                    {showTimeSlots && (
+                                        <ul>
+                                            {group.TimeSlots.map((slot) => (
+                                                <li key={slot.id}>
+                                                    {slot.dayOfWeek}: {slot.startAt}-{slot.endAt}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            ) : (
+                                "Розклад відсутній"
+                            )}
                         </div>
 
                         <div className="mt-4">

@@ -1,9 +1,12 @@
 import { AddUserButton } from "../ui/AddUserButton";
 import { DefaultBackground } from "./DefaultBackground";
 
-export const StudentRequestCard = ({ name, surname, languageLevel }) => {
+export const StudentRequestCard = ({ name, surname, languageLevel, selectStudent, openModal }) => {
     return (
-        <div className="w-[130px] h-[170px] rounded-xl relative ">
+        <div className="w-[130px] h-[170px] rounded-xl relative cursor-pointer" onClick={() => {
+            selectStudent();
+            openModal();
+        }}>
             <DefaultBackground type="student" title={name + " " + surname} />
             <div className="w-full h-full rounded-xl relative z-10">
                 <div className="absolute top-1 right-1">

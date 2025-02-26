@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { StudentRequests } from "../StudentRequests/StudentRequests";
 import { TeachingGroups } from "../TeachingGroups";
 import { API_ROUTES } from "../../shared/api/api-routes.js";
@@ -11,21 +11,21 @@ export const StudentsList = () => {
     const [error, setError] = useState(null);
     const [groupsGenerated, setGroupsGenerated] = useState(false);
 
-    useEffect(() => {
-        const fetchStudents = async () => {
-            try {
-                const res = await api.get(API_ROUTES.students);
-                setStudents(res.data);
-            } catch (err) {
-                console.error("Error fetching students:", err);
-                setError("Failed to fetch students");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStudents();
+    const fetchStudents = useCallback(async () => {
+        try {
+            const res = await api.get(API_ROUTES.students);
+            setStudents(res.data);
+        } catch (err) {
+            console.error("Error fetching students:", err);
+            setError("Failed to fetch students");
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchStudents();
+    }, [fetchStudents, groupsGenerated]);
 
     return (
         <div className="flex flex-col gap-[40px]">

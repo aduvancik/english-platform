@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 
 import { GroupCard } from "../../shared/layout";
 import { API_ROUTES } from "../../shared/api/api-routes.js";
-import { GroupInfoModal } from "./GroupInfoModal.jsx";
+import { GroupInfoModal } from "./GroupInfoModal";
 import { BasicButton } from "../../shared/ui/BasicButton.jsx";
 import { Loader } from "../../shared/ui/Loader.jsx";
 import api from "../../api/api";
@@ -34,7 +34,6 @@ export const TeachingGroups = ({ students, setGroupsGenerated }) => {
             const res = await api.get(API_ROUTES.groups.base); 
             setOriginalGroups(res.data);
             if (res.data && res.data.length > 0) {
-                console.log('set true');
                 setGroupsGenerated(true);
             }
         } catch (err) {
@@ -76,12 +75,9 @@ export const TeachingGroups = ({ students, setGroupsGenerated }) => {
         }
     };
 
-    // console.log("groups");
-    // console.log(groups.length === 0);
-
     return (
         <div>
-            <h3 className="text-[20px]">Moї групи</h3>
+            <h3 className="text-[20px]">Moї групи ({groups ? groups.length : 0})</h3>
             {loading && <Loader />}
             {error && <p>{error.message || "An unexpected error occurred"}</p>}
             {!loading && !error && (
