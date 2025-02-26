@@ -1,8 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, replace, useNavigate } from "react-router-dom";
 import { BackButton, SidebarButton } from "../../shared/ui";
+import { LogoutButton } from "../../shared/ui";
 import Logo from "../Logo/Logo";
 
 export const Sidebar = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="w-[20%] pt-3 bg-white h-full fixed flex flex-col">
             <div className="flex items-center justify-around mb-10">
@@ -42,6 +45,14 @@ export const Sidebar = () => {
                         </SidebarButton>
                     )}
                 </NavLink>
+                <LogoutButton
+                    handleClick={() => {
+                        localStorage.removeItem("authToken");
+                        navigate("/login", replace);
+                    }}
+                >
+                    Групи та учні
+                </LogoutButton>
             </div>
         </div>
     );

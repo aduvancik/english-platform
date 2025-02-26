@@ -6,4 +6,5 @@ export * from "./RemoveUserButton.jsx";
 export * from "./LabelledAddUserButton.jsx";
 export * from "./OptionButton.jsx";
 export * from "./ModalButton.jsx";
+export * from "./LogoutButton.jsx";
 export * from "./Loader.jsx";
