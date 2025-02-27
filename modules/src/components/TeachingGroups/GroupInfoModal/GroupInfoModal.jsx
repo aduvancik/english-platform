@@ -28,12 +28,12 @@ export const GroupInfoModal = ({ openModal, handleCloseModal, group }) => {
                         </div>
 
                         <div className="text-center my-3">
-                            {group.TimeSlots ? (
+                            {group.timeSlots ? (
                                 <div>
                                     <ModalButton handleClick={toggleTimeSlots}>{showTimeSlots ? "Заховати" : "Показати"} розклад</ModalButton>
                                     {showTimeSlots && (
                                         <ul>
-                                            {group.TimeSlots.map((slot) => (
+                                            {group.timeSlots.map((slot) => (
                                                 <li key={slot.id}>
                                                     {slot.dayOfWeek}: {slot.startAt}-{slot.endAt}
                                                 </li>
