@@ -37,9 +37,13 @@ const TodayEventsList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await api.get(API_ROUTES.groups);
-      setGroups(data);
-      console.log(data);
+      try {
+        const { data } = await api.get(API_ROUTES.groups.base);
+        setGroups(data);
+        console.log(data);
+      } catch (error) {
+        console.log(error.message);
+      }
     };
     fetchData();
   }, []);
