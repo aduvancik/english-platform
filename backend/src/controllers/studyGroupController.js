@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 import { Teacher, LanguageLevel, StudyGroup, Student, TimeSlot } from "../models/index.js";
 import { studyGroupSchema } from "../utils/validationSchemas.js";
 
@@ -122,6 +123,17 @@ export const generateStudyGroups = async (req, res, next) => {
 
         await StudyGroup.destroy({ where: {} });
 
+        const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+        function sortHelperTimeSlots(a, b) {
+            const timeComparison = a.startAt.localeCompare(b.startAt);
+            if (timeComparison !== 0) {
+                return timeComparison;
+            }
+
+            return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
+        }
+
         let count = 0;
         for (const teacher of teachers) {
             const teacherGroups = [];
@@ -135,21 +147,14 @@ export const generateStudyGroups = async (req, res, next) => {
                 teacherGroups.push(group);
             }
 
-            const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-            const sortedTeacherSlots = teacher.TimeSlots.sort((a, b) => {
-                const timeComparison = a.startAt.localeCompare(b.startAt);
-                if (timeComparison !== 0) {
-                    return timeComparison;
-                }
-                return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
-            });
+            const teacherTimeSlots = teacher.TimeSlots.sort(sortHelperTimeSlots);
 
-            const totalSlots = sortedTeacherSlots.length;
+            const totalSlots = teacherTimeSlots.length;
             const totalTeacherGroups = teacherGroups.length;
 
             for (let i = 0; i < totalSlots; ++i) {
                 const groupIndex = i % totalTeacherGroups;
-                await teacherGroups[groupIndex].addTimeSlots([sortedTeacherSlots[i].id]);
+                await teacherGroups[groupIndex].addTimeSlots([teacherTimeSlots[i].id]);
             }
         }
 
@@ -174,30 +179,93 @@ export const generateStudyGroups = async (req, res, next) => {
                 continue;
             }
 
-            let targetGroup = candidateGroups[0];
+            let finalGroup = candidateGroups[0];
             for (const group of candidateGroups) {
                 const groupStudentCount = await Student.count({
                     where: {
                         studyGroupId: group.id,
                     },
                 });
-                const targetGroupStudentCount = await Student.count({
+                const finalGroupStudentCount = await Student.count({
                     where: {
-                        studyGroupId: targetGroup.id,
+                        studyGroupId: finalGroup.id,
                     },
                 });
 
                 if (groupStudentCount < 3) {
-                    targetGroup = group;
+                    finalGroup = group;
                     break;
                 }
 
-                if (groupStudentCount < targetGroupStudentCount) {
-                    targetGroup = group;
+                if (groupStudentCount < finalGroupStudentCount) {
+                    finalGroup = group;
                 }
             }
 
-            await student.update({ studyGroupId: targetGroup.id });
+            await student.update({ studyGroupId: finalGroup.id });
+        }
+
+        // Divide groups into smaller ones
+        const maxGroupSize = 7;
+
+        for (const group of groups) {
+            const studentGroupCount = await Student.count({
+                where: { studyGroupId: group.id },
+            });
+
+            if (studentGroupCount < 8) {
+                continue;
+            }
+
+            const newSubGroups = [];
+            const totalSubGroups = Math.ceil(studentGroupCount / maxGroupSize);
+
+            for (let i = 0; i < totalSubGroups; ++i) {
+                const subGroup = await StudyGroup.create({
+                    name: `${group.name} - Subgroup ${i + 1}`,
+                    teacherId: group.teacherId,
+                    languageLevelId: group.languageLevelId,
+                });
+                newSubGroups.push(subGroup);
+            }
+
+            const studyGroupTimeSlots = group.TimeSlots.sort(sortHelperTimeSlots);
+            const totalSlots = studyGroupTimeSlots.length;
+
+            for (let i = 0; i < totalSlots; ++i) {
+                const subGroupIndex = i % totalSubGroups;
+                await newSubGroups[subGroupIndex].addTimeSlots([studyGroupTimeSlots[i].id]);
+            }
+
+            const students = await Student.findAll({
+                where: {
+                    studyGroupId: group.id,
+                },
+                include: [TimeSlot],
+            });
+
+            for (const student of students) {
+                for (let i = 0; i < newSubGroups.length; ++i) {
+                    const subGroup = await StudyGroup.findByPk(newSubGroups[i].id, {
+                        include: [TimeSlot],
+                    });
+
+                    const studentSubGroupCount = await Student.count({
+                        where: { studyGroupId: subGroup.id },
+                    });
+
+                    const studentTimeSlotIds = student.TimeSlots.map(slot => slot.id);
+                    const subGroupTimeSlotIds = subGroup.TimeSlots.map(slot => slot.id);
+
+                    const isSubset = studentTimeSlotIds.every(slot => subGroupTimeSlotIds.includes(slot));
+
+                    if (isSubset && studentSubGroupCount < maxGroupSize) {
+                        await student.update({ studyGroupId: subGroup.id });
+                    }
+                }
+            }
+
+            await group.destroy();
         }
 
         return res.status(200).json({ message: "Study groups generated" });
