@@ -24,7 +24,7 @@ const Calendar = () => {
     const fetchData = async () => {
       const { data: studentsData } = await api.get(API_ROUTES.students);
       setStudents(studentsData);
-      const { data } = await api.get(API_ROUTES.groups);
+      const { data } = await api.get(API_ROUTES.groups.base);
       setGroups(data);
       console.log(studentsData, data);
     };
