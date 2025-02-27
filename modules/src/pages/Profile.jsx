@@ -17,6 +17,8 @@ import { handleChange } from "../shared/utils/handleChange";
 import useSelectLevel from "../shared/hooks/useSelectLevel";
 //api
 import { API_ROUTES } from "../shared/api/api-routes";
+import { getDaysAndHoursFromSlots } from "../shared/utils/getDaysAndHoursFromSlots";
+import axios from "axios";
 
 export const ProfilePage = () => {
     //useRef for files input
@@ -28,6 +30,7 @@ export const ProfilePage = () => {
     //use state
     const [isFormSubmitted, setIsFormSubmitted] = useState(false); // Стан для перевірки, чи була надіслана форма
     const [errors, setErrors] = useState({});
+    const [responseData, setResponseData] = useState([]);
     const [dropdowns, setDropdowns] = useState({
         hours: false,
         days: false,
@@ -53,9 +56,84 @@ export const ProfilePage = () => {
     });
     const [showInput, setShowInput] = useState(false);
     const [imagePreview, setImagePreview] = useState("");
+    //use effect
+    useEffect(() => {
+        console.log(formData); // Перевірка значення formData після оновлення
+    }, [formData]); // Цей useEffect буде викликатися після кожної зміни formData
+
+    useEffect(() => {
+        const fetchTimeSlots = async () => {
+            try {
+                const response = await axios.get(`http://localhost:4000/time-slots`);
+
+                if (!response.data || response.data.length === 0) {
+                    console.log("No time slots found in API response");
+                }
+
+                setResponseData(response.data);
+            } catch (error) {
+                console.error("Error fetching time slots:", error);
+            }
+        };
+
+        fetchTimeSlots();
+    }, []);
+
 
 
     //функція для відкривання випадайки з годинами днями та левелом анг
+
+    useEffect(() => {
+        if (formData.fotoProfile instanceof File) {
+            const objectUrl = URL.createObjectURL(formData.fotoProfile);
+            setImagePreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl); // Очищення URL після оновлення
+        }
+    }, [formData.fotoProfile]);
+
+    useEffect(() => {
+        // Симулюємо отримання даних з бекенду
+        const mockBackendData = {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john.doe@example.com",
+            role: "teacher",
+            languageLevelId: [1, 2, 3],
+            timeSlotIds: [43, 115],
+            studyGroupId: 1,
+            certificate: [],
+            diploma: [],
+            fotoProfile: "",
+            workExperience: "",
+            aboutMe: ""
+        };
+
+        // Оновлюємо тільки ті поля, які є в mockBackendData
+        setFormData(prevData => ({
+            ...prevData,
+            ...Object.keys(mockBackendData).reduce((acc, key) => {
+                if (mockBackendData[key] !== undefined) {
+                    acc[key] = mockBackendData[key];
+                }
+                return acc;
+            }, {})
+        }));
+        console.log(formData);
+
+    }, []);
+
+
+    useEffect(() => {
+        if (responseData.length > 0) {
+            getDaysAndHoursFromSlots(responseData, formData.timeSlotIds, setFormData, formData);
+            console.log(formData.day);
+            console.log(formData.hour);
+
+        }
+    }, [formData.timeSlotIds]); // Запуск лише після зміни `responseData`
+
+    //enother code
+
     const toggleDropdown = (key) => {
         setDropdowns((prev) => {
             const isCurrentlyOpen = prev[key];
@@ -67,68 +145,34 @@ export const ProfilePage = () => {
             };
         });
     };
+    // const getUserData = async () => {
+    //     try {
+    //         const token = localStorage.getItem('authToken');
 
-    useEffect(() => {
-        if (formData.fotoProfile instanceof File) {
-            const objectUrl = URL.createObjectURL(formData.fotoProfile);
-            setImagePreview(objectUrl);
-            return () => URL.revokeObjectURL(objectUrl); // Очищення URL після оновлення
-        }
-    }, [formData.fotoProfile]);
+    //         if (!token) {
+    //             console.error('No token found');
+    //             return;
+    //         }
 
-    useEffect(() => {
-        // Simulating receiving data from the backend
-        const mockBackendData = {
-            firstName: "John",
-            lastName: "Doe",
-            email: "john.doe@example.com",
-            role: "teacher",
-            languageLevelId: [1, 2, 3],
-            hour: ["17:00 - 18:00"],
-            day: ["Monday Thursday"],
-            timeSlotIds: [1],
-            studyGroupId: 1,
-            certificate: [],
-            diploma: [],
-            fotoProfile: "",
-            workExperience: "",
-            aboutMe: ""
-        };
+    //         const response = await fetch(`http://localhost:4000${API_ROUTES.teachers}`, {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //         });
 
-        setFormData(mockBackendData); // Simulate setting the data received from the backend
-    }, []);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch user data');
+    //         }
 
+    //         const data = await response.json();
+    //         console.log("Тут ви отримуєте дані користувача", data); // Тут ви отримуєте дані користувача
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
-    const getUserData = async () => {
-        try {
-          const token = localStorage.getItem('authToken');
-          
-          if (!token) {
-            console.error('No token found');
-            return;
-          }
-      
-          const response = await fetch(`http://localhost:4000${API_ROUTES.teachers}`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-      
-          if (!response.ok) {
-            throw new Error('Failed to fetch user data');
-          }
-      
-          const data = await response.json();
-          console.log("Тут ви отримуєте дані користувача", data); // Тут ви отримуєте дані користувача
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      
-      getUserData();
-      
-
+    // getUserData();    
 
 
     const handleKeyDown = (e) => {
