@@ -50,11 +50,11 @@ export async function seedDatabase() {
 function generateTimeSlotData() {
     const timeSlots = [];
     let hour = 0;
-    let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     let dayIndex = 0;
 
-    while (dayIndex < 7) {
-        while (hour <= 23) {
+    while (hour <= 23) {
+        while (dayIndex < 7) {
             const start_time = new Date();
             start_time.setHours(hour, 0, 0, 0);
 
@@ -67,11 +67,11 @@ function generateTimeSlotData() {
                 dayOfWeek: days[dayIndex],
             });
 
-            hour += 1;
+            dayIndex += 1;
         }
 
-        hour = 0;
-        dayIndex += 1;
+        dayIndex = 0;
+        hour += 1;
     }
 
     return timeSlots;
