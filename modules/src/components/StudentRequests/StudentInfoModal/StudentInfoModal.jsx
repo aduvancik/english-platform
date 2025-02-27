@@ -34,12 +34,12 @@ export const StudentInfoModal = ({ openModal, handleCloseModal, student }) => {
                             <p className="font-bold">Група відсутня</p>
                         )}
                         <div>
-                            {student.TimeSlots ? (
+                            {student.timeSlots ? (
                                 <div>
                                     <span className="font-bold">Розклад:</span>
                                     <ul>
-                                        {student.TimeSlots &&
-                                            student.TimeSlots.map((slot) => (
+                                        {student.timeSlots &&
+                                            student.timeSlots.map((slot) => (
                                                 <li key={slot.id}>
                                                     {slot.dayOfWeek}: {slot.startAt}-{slot.endAt}
                                                 </li>

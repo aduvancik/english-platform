@@ -8,9 +8,14 @@ const GROUP_ROUTES = {
     generate: "/study-groups/generate",
 }
 
+const TEACHER_ROUTES = {
+    base: "/teachers",
+    groups: "/teachers/study-groups"
+}
+
 export const API_ROUTES = {
     auth: AUTH_ROUTES,
     groups: GROUP_ROUTES,
-    teachers: "/teachers",
+    teachers: TEACHER_ROUTES,
     students: "/students",
 }
