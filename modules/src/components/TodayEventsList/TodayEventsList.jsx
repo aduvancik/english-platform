@@ -1,27 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { API_ROUTES } from "../../shared/api/api-routes";
+import api from "../../api/api";
 
-const data = [
-  {
-    id: 1,
-    name: "High Five",
-    time: "10:00-11:00",
-  },
-  {
-    id: 2,
-    name: "Smart Minds",
-    time: "12:00-13:00",
-  },
-  {
-    id: 3,
-    name: "Fluent Squad",
-    time: "14:00-15:00",
-  },
-  {
-    id: 4,
-    name: "Lingo Masters",
-    time: "16:00-17:00",
-  },
-];
+// const data = [
+//   {
+//     id: 1,
+//     name: "High Five",
+//     time: "10:00-11:00",
+//   },
+//   {
+//     id: 2,
+//     name: "Smart Minds",
+//     time: "12:00-13:00",
+//   },
+//   {
+//     id: 3,
+//     name: "Fluent Squad",
+//     time: "14:00-15:00",
+//   },
+//   {
+//     id: 4,
+//     name: "Lingo Masters",
+//     time: "16:00-17:00",
+//   },
+// ];
 
 const TodayEventsList = () => {
   const date = new Date();
@@ -31,6 +33,17 @@ const TodayEventsList = () => {
     date.getFullYear(),
   ].map((num) => num.toString().padStart(2, "0"));
 
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data } = await api.get(API_ROUTES.groups);
+      setGroups(data);
+      console.log(data);
+    };
+    fetchData();
+  }, []);
+
   return (
     <div>
       <div className="flex gap-[12px] items-baseline">
@@ -38,10 +51,10 @@ const TodayEventsList = () => {
         <p>{`${day}-${month}-${year}`}</p>
       </div>
       <ul className="flex flex-col gap-3 w-[432px] p-[24px] bg-white rounded-xl">
-        {data.map((event) => (
-          <li key={event.id} className="flex justify-between">
-            <p className="font-bold">{event.name}</p>
-            <p>{event.time}</p>
+        {groups.map((group) => (
+          <li key={group.id} className="flex justify-between">
+            <p className="font-bold">{group.name}</p>
+            <p>{group.teacher.firstName}</p>
           </li>
         ))}
       </ul>

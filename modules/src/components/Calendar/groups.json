@@ -1,0 +1,154 @@
+[
+  {
+    "id": 1,
+    "name": "High Five",
+    "languageLevel": {
+      "id": 5,
+      "name": "C1"
+    },
+    "teacher": {
+      "id": 1,
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "email": "alice@example.com"
+    },
+    "students": [
+      { "id": 101, "firstName": "Bob", "lastName": "Smith" },
+      { "id": 102, "firstName": "Charlie", "lastName": "Brown" },
+      { "id": 103, "firstName": "David", "lastName": "Lee" },
+      { "id": 104, "firstName": "Eve", "lastName": "Wilson" },
+      { "id": 105, "firstName": "Frank", "lastName": "Garcia" },
+      { "id": 106, "firstName": "Grace", "lastName": "Martinez" }
+    ],
+    "schedule": [
+      { "day": "Понеділок", "time": "12:00", "date": "2025-02-24T12:00:00" },
+      { "day": "Четвер", "time": "17:00", "date": "2025-02-27T17:00:00" },
+      { "day": "Понеділок", "time": "12:00", "date": "2025-03-03T12:00:00" },
+      { "day": "Четвер", "time": "17:00", "date": "2025-03-06T17:00:00" },
+      { "day": "Понеділок", "time": "12:00", "date": "2025-03-10T12:00:00" },
+      { "day": "Четвер", "time": "17:00", "date": "2025-03-13T17:00:00" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Golden Eagles",
+    "languageLevel": {
+      "id": 4,
+      "name": "B2"
+    },
+    "teacher": {
+      "id": 2,
+      "firstName": "Michael",
+      "lastName": "Davis",
+      "email": "michael@example.com"
+    },
+    "students": [
+      { "id": 107, "firstName": "Hannah", "lastName": "Rodriguez" },
+      { "id": 108, "firstName": "Isaac", "lastName": "Lopez" },
+      { "id": 109, "firstName": "Julia", "lastName": "Young" },
+      { "id": 110, "firstName": "Kevin", "lastName": "King" },
+      { "id": 111, "firstName": "Laura", "lastName": "Wright" },
+      { "id": 112, "firstName": "Mason", "lastName": "Hill" },
+      { "id": 113, "firstName": "Nora", "lastName": "Green" }
+    ],
+    "schedule": [
+      { "day": "Вівторок", "time": "13:00", "date": "2025-02-25T13:00:00" },
+      { "day": "П'ятниця", "time": "16:00", "date": "2025-02-28T16:00:00" },
+      { "day": "Вівторок", "time": "13:00", "date": "2025-03-04T13:00:00" },
+      { "day": "П'ятниця", "time": "16:00", "date": "2025-03-07T16:00:00" },
+      { "day": "Вівторок", "time": "13:00", "date": "2025-03-11T13:00:00" },
+      { "day": "П'ятниця", "time": "16:00", "date": "2025-03-14T16:00:00" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Crazy Frogs",
+    "languageLevel": {
+      "id": 6,
+      "name": "C2"
+    },
+    "teacher": {
+      "id": 3,
+      "firstName": "Olivia",
+      "lastName": "Moore",
+      "email": "olivia@example.com"
+    },
+    "students": [
+      { "id": 114, "firstName": "Owen", "lastName": "Scott" },
+      { "id": 115, "firstName": "Penelope", "lastName": "Adams" },
+      { "id": 116, "firstName": "Quinn", "lastName": "Nelson" },
+      { "id": 117, "firstName": "Ryan", "lastName": "Carter" },
+      { "id": 118, "firstName": "Sophia", "lastName": "Mitchell" },
+      { "id": 119, "firstName": "Thomas", "lastName": "Roberts" }
+    ],
+    "schedule": [
+      { "day": "Середа", "time": "14:00", "date": "2025-02-26T14:00:00" },
+      { "day": "Субота", "time": "12:00", "date": "2025-03-01T12:00:00" },
+      { "day": "Середа", "time": "14:00", "date": "2025-03-05T14:00:00" },
+      { "day": "Субота", "time": "12:00", "date": "2025-03-08T12:00:00" },
+      { "day": "Середа", "time": "14:00", "date": "2025-03-12T14:00:00" },
+      { "day": "Субота", "time": "12:00", "date": "2025-03-15T12:00:00" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Bright Stars",
+    "languageLevel": {
+      "id": 3,
+      "name": "B1"
+    },
+    "teacher": {
+      "id": 1,
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "email": "alice@example.com"
+    },
+    "students": [
+      { "id": 120, "firstName": "Uma", "lastName": "Phillips" },
+      { "id": 121, "firstName": "Victor", "lastName": "Campbell" },
+      { "id": 122, "firstName": "Willow", "lastName": "Parker" },
+      { "id": 123, "firstName": "Xavier", "lastName": "Evans" },
+      { "id": 124, "firstName": "Yara", "lastName": "Edwards" },
+      { "id": 125, "firstName": "Zachary", "lastName": "Collins" }
+    ],
+    "schedule": [
+      { "day": "Понеділок", "time": "16:00", "date": "2025-02-24T16:00:00" },
+      { "day": "Четвер", "time": "12:00", "date": "2025-02-27T12:00:00" },
+      { "day": "Понеділок", "time": "16:00", "date": "2025-03-03T16:00:00" },
+      { "day": "Четвер", "time": "12:00", "date": "2025-03-06T12:00:00" },
+      { "day": "Понеділок", "time": "16:00", "date": "2025-03-10T16:00:00" },
+      { "day": "Четвер", "time": "12:00", "date": "2025-03-13T12:00:00" }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Bullers",
+    "languageLevel": {
+      "id": 2,
+      "name": "A2"
+    },
+    "teacher": {
+      "id": 4,
+      "firstName": "William",
+      "lastName": "Baker",
+      "email": "william@example.com"
+    },
+    "students": [
+      { "id": 126, "firstName": "Ava", "lastName": "Stewart" },
+      { "id": 127, "firstName": "Benjamin", "lastName": "Sanchez" },
+      { "id": 128, "firstName": "Chloe", "lastName": "Morris" },
+      { "id": 129, "firstName": "Daniel", "lastName": "Rogers" },
+      { "id": 130, "firstName": "Ella", "lastName": "Reed" },
+      { "id": 131, "firstName": "Finn", "lastName": "Howard" },
+      { "id": 132, "firstName": "Gabriella", "lastName": "Wood" }
+    ],
+    "schedule": [
+      { "day": "Вівторок", "time": "14:00", "date": "2025-02-25T14:00:00" },
+      { "day": "П'ятниця", "time": "15:00", "date": "2025-02-28T15:00:00" },
+      { "day": "Вівторок", "time": "14:00", "date": "2025-03-04T14:00:00" },
+      { "day": "П'ятниця", "time": "15:00", "date": "2025-03-07T15:00:00" },
+      { "day": "Вівторок", "time": "14:00", "date": "2025-03-11T14:00:00" },
+      { "day": "П'ятниця", "time": "15:00", "date": "2025-03-14T15:00:00" }
+    ]
+  }
+]
