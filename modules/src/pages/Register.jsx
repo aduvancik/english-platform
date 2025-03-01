@@ -59,6 +59,7 @@ function Register() {
             try {
                 const response = await axios.get(`http://localhost:4000/time-slots`);
                 setResponseData(response.data); // зберігаємо отримані тайм слоти в state
+                console.log(response.data);
             } catch (error) {
                 setError("Error fetching time slots"); // обробка помилок
 
