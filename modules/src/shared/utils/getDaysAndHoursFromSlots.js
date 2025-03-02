@@ -5,7 +5,6 @@ export const getDaysAndHoursFromSlots = (timeSlots, selectedSlotIds, setFormData
 
   const selectedDays = [...new Set(selectedSlots.map(slot => slot.dayOfWeek))];
   const selectedHours = [...new Set(selectedSlots.map(slot => `${slot.startAt.substring(0, 5)} - ${slot.endAt.substring(0, 5)}`))];
-  console.log("selectedDays", selectedDays);
 
   // Знаходимо індекси днів у `days`
   // Отримуємо значення днів, які містяться в `selectedDays`

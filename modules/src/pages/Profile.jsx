@@ -22,6 +22,7 @@ import { getDaysAndHoursFromSlots } from "../shared/utils/getDaysAndHoursFromSlo
 import axios from "axios";
 import { parseJwt } from "../shared/utils/parseJwt";
 import { Loader } from "../shared/ui";
+import { filterTimeSlots } from "../shared/utils/filterTimeSlots";
 //jwt
 
 
@@ -84,7 +85,7 @@ export const ProfilePage = () => {
                 })
                     .then(response => {
                         const mockBackendData = response.data;
-                        console.log(mockBackendData);
+                        console.log("mockBackendData", mockBackendData);
 
                         if (decodedToken.role === "student") {
                             // Якщо роль студент: обробка даних для студента
@@ -126,15 +127,18 @@ export const ProfilePage = () => {
         }
     }, [userId]);
 
+    useEffect(() => {
+
+        console.log("formData", formData);
+    }, [formData])
 
 
-
-    console.log("formData", formData);
 
     useEffect(() => {
         const fetchTimeSlots = async () => {
             try {
                 const response = await axios.get(`http://localhost:4000${API_ROUTES.time_slots}`);
+                console.log(response.data);
 
                 if (!response.data || response.data.length === 0) {
                     console.log("No time slots found in API response");
@@ -161,12 +165,30 @@ export const ProfilePage = () => {
 
     //отримання днів та годин з тайм слоту
     useEffect(() => {
-        console.log(formData.timeSlotIds);
-
-        if (responseData.length > 0) {
+        if (responseData.length > 0 && formData.timeSlotIds.length !== 0) {
+            console.log("Перевірка часових слотів:", formData.timeSlotIds);
             getDaysAndHoursFromSlots(responseData, formData.timeSlotIds, setFormData, formData);
         }
-    }, [formData.timeSlotIds]); // Запуск лише після зміни `responseData`
+    }, [responseData, formData.timeSlotIds]); // Викликається, коли responseData або timeSlotIds змінюються
+
+    useEffect(() => {
+        if (!responseData.length) return;
+
+        const newTimeSlotIds = filterTimeSlots(responseData, formData.day, formData.hour);
+        console.log("Часові слоти після фільтрації:", newTimeSlotIds);
+
+        // Перевірка чи змінився масив timeSlotIds
+        if (JSON.stringify(newTimeSlotIds) !== JSON.stringify(formData.timeSlotIds)) {
+            console.log("Оновлення timeSlotIds:", newTimeSlotIds);
+            setFormData((prev) => ({
+                ...prev,
+                timeSlotIds: newTimeSlotIds
+            }));
+        }
+    }, [formData.day, formData.hour, responseData]); // Викликається, коли змінюється день або година
+
+
+
 
     //enother code
 
@@ -263,6 +285,60 @@ export const ProfilePage = () => {
             [field]: prev[field].filter((_, i) => i !== index) // Видаляємо файл з правильного поля
         }));
     };
+
+
+    //оновлення даних про студента
+
+    //при натисканні на кнопку зберегти
+    const handleSave = () => {
+        const { firstName, lastName, email, languageLevelId, timeSlotIds } = formData;
+        console.log(timeSlotIds);
+
+        // Викликаємо функцію для оновлення студента
+        updateStudent(firstName, lastName, email, languageLevelId[0], timeSlotIds); // Використовуємо 0 індекс для `languageLevelId`
+    };
+
+    const updateStudent = async (firstName, lastName, email, languageLevelId, timeSlotIds) => {
+        const selectedTimeSlots = timeSlotIds.map(id => responseData.find(slot => slot.id === id));
+        console.log("selectedTimeSlots", selectedTimeSlots);
+
+        try {
+            // Створюємо об'єкт з даними для оновлення
+            const updatedData = {
+                firstName,
+                lastName,
+                email,
+                languageLevelId,
+                timeSlots: selectedTimeSlots
+            };
+
+            console.log("updatedData", updatedData);
+
+
+            // Відправка PATCH запиту на сервер
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`http://localhost:4000/students/${userId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${authToken}`, // Якщо є токен авторизації
+                },
+                body: JSON.stringify(updatedData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Не вдалося оновити студента");
+            }
+            const responseData = await response.json(); // тут може бути порожня відповідь
+            console.log(responseData); // перевірка відповіді
+            const data = await response.json();
+            console.log("Student updated:", data.message);
+        } catch (error) {
+            console.error("Помилка при оновленні студента:", error);
+        }
+    };
+
+
 
     return (
         <div className="flex flex-col gap-[40px]">
@@ -543,6 +619,7 @@ export const ProfilePage = () => {
                             </div>
                         </div>
                     }
+                    <button type="button" onClick={handleSave}>Зберегти</button>
                 </div>
             )}
         </div >
