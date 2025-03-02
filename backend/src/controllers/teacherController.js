@@ -1,11 +1,11 @@
 import { LanguageLevel, StudyGroup, Teacher, TimeSlot } from "../models/index.js";
 import { hashSha256 } from "../utils/hashUtil.js";
-import { teacherSchema } from "../utils/validationSchemas.js";
+import { createTeacherSchema, patchTeacherSchema } from "../utils/validationSchemas.js";
 
 export const createTeacher = async (req, res, next) => {
     try {
         console.log(req.body);
-        await teacherSchema.validate(req.body);
+        await createTeacherSchema.validate(req.body);
 
         const { firstName, lastName, email, password, languageLevelIds, timeSlotIds } = req.body;
 
@@ -88,6 +88,38 @@ export const deleteTeacher = async (req, res, next) => {
 
         await teacher.destroy();
         return res.status(200).json({ message: "Teacher deleted" });
+    } catch (er) {
+        next(er);
+    }
+};
+
+export const patchTeacher = async (req, res, next) => {
+    try {
+        await patchTeacherSchema.validate(req.body);
+
+        const data = req.body;
+        const { id } = req.params;
+
+        await Teacher.update(
+            data,
+            {
+                where: { id },
+            },
+        );
+
+        let teacher;
+
+        if ("languageLevelIds" in data) {
+            teacher = await Teacher.findByPk(id);
+            await teacher.setLanguageLevels(data.languageLevelIds);
+        }
+
+        if ("timeSlotIds" in data) {
+            teacher = teacher || await Teacher.findByPk(id);
+            await teacher.setTimeSlots(data.timeSlotIds);
+        }
+
+        return res.status(200).json({ message: "Teacher updated" });
     } catch (er) {
         next(er);
     }

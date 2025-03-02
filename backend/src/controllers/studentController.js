@@ -86,15 +86,16 @@ export const patchStudent = async (req, res, next) => {
         const data = req.body;
         const { id } = req.params;
 
-        const [updatedCount] = await Student.update(
+        await Student.update(
             data,
             {
                 where: { id },
             },
         );
 
-        if (!updatedCount) {
-            return res.status(204).send();
+        if ("timeSlotIds" in data) {
+            const student = await Student.findByPk(id);
+            await student.setTimeSlots(data.timeSlotIds);
         }
 
         return res.status(200).json({ message: "Student updated" });
