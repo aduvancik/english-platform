@@ -1,9 +1,11 @@
 const SelectedDays = ({ formData, days }) => {
-    // console.log(formData, days);
-    // console.log(formData.day.map(day => (
+    formData.day.map(day => (
+        console.log(
+            Object.keys(days).find(key => days[key] === day)
+        )
+        
+    ))
 
-    //     Object.keys(days).find(key => days[key] === day)
-    // )));
 
     if (formData.role === "student") {
         return formData.day.length > 0 ? (
