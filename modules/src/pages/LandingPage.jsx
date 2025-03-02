@@ -13,7 +13,7 @@ const LandingPage = () => {
       <Navigation />
 
       <HeroSection />
-      <div className="mx-84">
+      <div className="w-6/10 mx-auto">
         <BenefitsSection />
         <ChooseRoleSection />
         <GetStarted />

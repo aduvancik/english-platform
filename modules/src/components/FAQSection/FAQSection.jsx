@@ -17,7 +17,7 @@ const AccordionItem = ({ header, ...rest }) => (
         />
       </>
     )}
-    className="border-b border-gray-400 text-2xl p-8"
+    className="border-b border-gray-400 text-xl sm:text-2xl p-8"
     buttonProps={{
       className: ({ isEnter }) =>
         `flex w-full p-4 text-left hover:bg-slate-100 ${
@@ -34,7 +34,7 @@ const AccordionItem = ({ header, ...rest }) => (
 const FAQSection = () => {
   return (
     <section className="my-16">
-      <h2 className="text-3xl font-bold mb-8">Залишились запитання?</h2>
+      <h2 className="text-2xl sm:text-3xl font-normal !important mb-8">Залишились запитання?</h2>
       <Accordion transition transitionTimeout={350}>
         <AccordionItem
           header="В якому форматі проходять заняття?"
