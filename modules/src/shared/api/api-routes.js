@@ -18,4 +18,6 @@ export const API_ROUTES = {
     groups: GROUP_ROUTES,
     teachers: TEACHER_ROUTES,
     students: "/students",
+    time_slots: "/time-slots",
+
 }
