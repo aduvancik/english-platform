@@ -173,7 +173,7 @@ export const ProfilePage = () => {
 
     useEffect(() => {
         if (!responseData.length) return;
-
+        //шукає відповідні тайм слоти
         const newTimeSlotIds = filterTimeSlots(responseData, formData.day, formData.hour);
         console.log("Часові слоти після фільтрації:", newTimeSlotIds);
 
@@ -299,8 +299,7 @@ export const ProfilePage = () => {
     };
 
     const updateStudent = async (firstName, lastName, email, languageLevelId, timeSlotIds) => {
-        const selectedTimeSlots = timeSlotIds.map(id => responseData.find(slot => slot.id === id));
-        console.log("selectedTimeSlots", selectedTimeSlots);
+        // console.log("updatedData", updatedData);
 
         try {
             // Створюємо об'єкт з даними для оновлення
@@ -309,10 +308,12 @@ export const ProfilePage = () => {
                 lastName,
                 email,
                 languageLevelId,
-                timeSlots: selectedTimeSlots
+                timeSlotIds
             };
 
             console.log("updatedData", updatedData);
+            console.log("lalal");
+
 
 
             // Відправка PATCH запиту на сервер
