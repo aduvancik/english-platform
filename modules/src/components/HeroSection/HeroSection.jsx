@@ -3,33 +3,35 @@ import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
-    <section className="flex justify-between mx-48 my-8 bg-white rounded-2xl p-24 shadow-lg ">
-      <div className="">
+    <section className="flex flex-col lg:flex-row items-center justify-around w-4/5 mx-auto my-16 bg-white rounded-2xl p-16 shadow-xl">
+      {/* Текстовий блок */}
+      <div className="text-center lg:text-left max-w-lg">
         <h1
-          className="text-9xl mb-4 font-bold"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold"
           style={{ fontFamily: "var(--font-oswald)" }}
         >
           enGo
         </h1>
-        <p className="mb-24 w-108">
+        <p className="mt-6 text-lg sm:text-xl md:text-1xl leading-relaxed">
           Cучасна онлайн-платформа, яка об&apos;єднує викладачів та студентів
           для ефективного вивчення англійської мови.
         </p>
-        <p className="text-white ">
-          <Link
-            to="/register"
-            className="bg-emerald-500 rounded-lg px-16 py-4 transition duration-300 ease-in-out hover:bg-emerald-600 shadow-lg shadow-emerald-500/50"
-          >
-            Зареєструватись
-          </Link>
-        </p>
+        <Link
+          to="/register"
+          className="mt-8 inline-block bg-emerald-500 text-white rounded-lg px-12 py-4 text-xl transition duration-300 ease-in-out hover:bg-emerald-600 shadow-md font-bold"
+        >
+          Зареєструватись
+        </Link>
       </div>
-      <img
-        src="/hero-image.jpg"
-        alt="group of happy people"
-        width="400px"
-        className="rounded-full"
-      />
+
+      {/* Зображення */}
+      <div className="mt-10 lg:mt-0 flex-shrink-0">
+        <img
+          src="/hero-image.jpg"
+          alt="group of happy people"
+          className="w-[350px] h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] object-cover rounded-full"
+        />
+      </div>
     </section>
   );
 };

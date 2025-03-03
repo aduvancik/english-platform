@@ -33,7 +33,7 @@ export const studyGroupSchema = object({
         .required(),
 });
 
-export const teacherSchema = object({
+export const createTeacherSchema = object({
     firstName: string().max(255).required(),
     lastName: string().max(255).required(),
     email: string().max(255).email().required(),
@@ -47,4 +47,13 @@ export const teacherSchema = object({
         .of(number().integer().required())
         .min(1)
         .required(),
+});
+
+export const patchTeacherSchema = object({
+    firstName: string().max(255).optional(),
+    lastName: string().max(255).optional(),
+    email: string().max(255).email().optional(),
+    password: string().min(8).max(255).optional(),
+    languageLevelIds: array().optional(),
+    timeSlotIds: array().optional(),
 });
