@@ -272,3 +272,80 @@ export const generateStudyGroups = async (req, res, next) => {
         next(er);
     }
 };
+
+export const generateStudyGroupsV2 = async (req, res, next) => {
+    try {
+        const students = await Student.findAll({
+            include: [LanguageLevel,
+                {
+                    model: TimeSlot,
+                    through: { attributes: [] },
+                },
+            ],
+        });
+
+        const teachers = await Teacher.findAll({
+            include: [LanguageLevel, {
+                model: TimeSlot,
+                through: { attributes: [] },
+            }],
+        });
+
+        const timeSlots = await TimeSlot.findAll();
+
+        let timeSlotGroups = { };
+
+        for (const timeSlot of timeSlots) {
+            timeSlotGroups[timeSlot.id] = {};
+            for (let languageLevelId = 1; languageLevelId < 7; ++languageLevelId) {
+                timeSlotGroups[timeSlot.id][languageLevelId] = { students: [], isTaken: false };
+            }
+        }
+
+        for (const groupTimeSlotId of Object.keys(timeSlotGroups)) {
+            for (const groupLanguageLevelId of Object.keys(timeSlotGroups[groupTimeSlotId])) {
+                for (const student of students) {
+                    for (const studentTimeSlot of student.TimeSlots) {
+                        if (studentTimeSlot.id === parseInt(groupTimeSlotId)
+                            && student.languageLevelId === parseInt(groupLanguageLevelId)) {
+                            timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].students.push(student);
+                        }
+                    }
+                }
+            }
+        }
+
+        let count = 0;
+        await StudyGroup.destroy({ where: {} });
+
+        for (const groupTimeSlotId of Object.keys(timeSlotGroups)) {
+            for (const groupLanguageLevelId of Object.keys(timeSlotGroups[groupTimeSlotId])) {
+                for (const teacher of teachers) {
+                    for (const teacherTimeSlot of teacher.TimeSlots) {
+                        for (const teacherLanguageLevel of teacher.LanguageLevels) {
+                            if (!timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].isTaken
+                                && teacherTimeSlot.id === parseInt(groupTimeSlotId)
+                                && teacherLanguageLevel.id === parseInt(groupLanguageLevelId)
+                                && timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].students.length !== 0) {
+                                const group = await StudyGroup.create({
+                                    name: `Group ${++count}`,
+                                    teacherId: teacher.id,
+                                    languageLevelId: teacherLanguageLevel.id,
+                                });
+                                await group.addTimeSlots([teacherTimeSlot.id]);
+                                for (const student of timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].students) {
+                                    await student.update({ studyGroupId: group.id });
+                                }
+                                timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].isTaken = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        res.status(200).json({ message: "Study groups generated" });
+    } catch (er) {
+        next(er);
+    }
+};
