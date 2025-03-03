@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 
 const dataStudents = JSON.parse(await readFile("dataStudents.json"));
 const dataTeachers = JSON.parse(await readFile("dataTeachers.json"));
+const dataStudentTimeSlots = JSON.parse(await readFile("dataStudentTimeSlots.json"));
 
 export async function seedDatabase() {
     try {
@@ -25,22 +26,15 @@ export async function seedDatabase() {
 
         const teachers = await Teacher.bulkCreate(dataTeachers);
 
-        for (let i = 0; i < teachers.length / 2; ++i) {
-            if (i % 3 === 0) {
-                await teachers[i].addLanguageLevels([1]);
-            }
+        for (let i = 0; i < teachers.length; ++i) {
             await teachers[i].addLanguageLevels([1, 2, 3]);
-            await teachers[i].addTimeSlots(getRandomTimeSlotIds({ size: 60 }));
-        }
-        for (let i = teachers.length / 2; i < teachers.length; ++i) {
-            await teachers[i].addLanguageLevels([4, 5, 6]);
-            await teachers[i].addTimeSlots(getRandomTimeSlotIds({ size: 60 }));
+            await teachers[i].addTimeSlots([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
         }
 
         const students = await Student.bulkCreate(dataStudents);
 
         for (let i = 0; i < students.length; ++i) {
-            await students[i].addTimeSlots(getRandomTimeSlotIds({ size: 1 }));
+            await students[i].addTimeSlots(dataStudentTimeSlots[i].timeSlotIds);
         }
     } catch (er) {
         console.log(`Error: ${er}`);
@@ -77,6 +71,7 @@ function generateTimeSlotData() {
     return timeSlots;
 }
 
+// eslint-disable-next-line no-unused-vars
 function getRandomTimeSlotIds({ size }) {
     const availableNumbers = Array.from({ length: 168 }, (_, i) => i + 1);
     const shuffled = availableNumbers.sort(() => Math.random() - 0.5);
