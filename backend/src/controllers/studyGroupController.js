@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+// import { Sequelize } from "sequelize";
 import { Teacher, LanguageLevel, StudyGroup, Student, TimeSlot } from "../models/index.js";
 import { studyGroupSchema } from "../utils/validationSchemas.js";
 

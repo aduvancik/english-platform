@@ -1,92 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineEdit } from "react-icons/md";
 
+import api from "../../api/api";
+import { API_ROUTES } from "../../shared/api/api-routes";
+import { getTimeSlot, getWeekday } from "../../shared/utils/dateFormatting";
+import { daysOfWeek, timeSlots } from "../../shared/constants/data";
+
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import "../Calendar/Calendar.css";
 
-// const names = [
-//   { id: 1, firstName: "Anna", lastName: "Kovalchuk" },
-//   { id: 2, firstName: "Dmytro", lastName: "Shevchenko" },
-//   { id: 3, firstName: "Oksana", lastName: "Ivanenko" },
-//   { id: 4, firstName: "Yurii", lastName: "Petryk" },
-//   { id: 5, firstName: "Sofia", lastName: "Tkachenko" },
-//   { id: 6, firstName: "Oleksandr", lastName: "Bondarenko" },
-//   { id: 7, firstName: "Natalia", lastName: "Hrytsenko" },
-// ];
-
-const daysOfWeek = [
-  "Понеділок",
-  "Вівторок",
-  "Середа",
-  "Четвер",
-  "П'ятниця",
-  "Субота",
-];
-
-const timeSlots = [
-  "12:00-13:00",
-  "13:00-14:00",
-  "14:00-15:00",
-  "15:00-16:00",
-  "16:00-17:00",
-  "17:00-18:00",
-];
-
-const CalendarModal = ({
-  selectedEvent,
-  lesson,
-  openModal,
-  onClose,
-  onSave,
-}) => {
+const CalendarModal = ({ selectedEvent, openModal, onClose, onSave }) => {
+  const [currentGroup, setCurrentGroup] = useState(null);
+  const [students, setStudents] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
 
   useEffect(() => {
-    if (selectedEvent) {
-      setSelectedDay(getWeekday(selectedEvent._instance?.range.start));
-      setSelectedTimeSlot(
-        selectedEvent._instance?.range
-          ? getTimeSlot(
-              selectedEvent._instance.range.start,
-              selectedEvent._instance.range.end
-            )
-          : ""
-      );
-      console.log(selectedEvent);
-    }
-    setIsEditing(false);
+    const fetchData = async () => {
+      if (!selectedEvent?.groupId) {
+        setStudents([]);
+        setCurrentGroup(null);
+        return;
+      }
+
+      try {
+        const groupResponse = await api.get(
+          `${API_ROUTES.groups.base}/${selectedEvent.groupId}`
+        );
+        setCurrentGroup(groupResponse.data);
+
+        const studentsResponse = await api.get(API_ROUTES.students);
+        const groupStudents = studentsResponse.data.filter(
+          (student) => student.studyGroupId === selectedEvent.groupId
+        );
+        setStudents(groupStudents);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [selectedEvent]);
 
-  useEffect(() => {}, [selectedEvent]);
-
-  const getTimeSlot = (start, end) => {
-    if (start && end) {
-      const options = { hour: "2-digit", minute: "2-digit" };
-      return `${start.toLocaleTimeString(
-        "uk-UA",
-        options
-      )}-${end.toLocaleTimeString("uk-UA", options)}`;
+  useEffect(() => {
+    if (selectedEvent) {
+      setSelectedDay(getWeekday(selectedEvent.start));
+      setSelectedTimeSlot(getTimeSlot(selectedEvent.start));
+      setIsEditing(false);
     }
-    return "час не вказано";
-  };
-
-  const getWeekday = (date) => {
-    if (date) {
-      const weekday = date.toLocaleDateString("uk-UA", { weekday: "long" });
-      return weekday.charAt(0).toUpperCase() + weekday.slice(1);
-    }
-    return "День не вказано";
-  };
+  }, [selectedEvent]);
 
   const handleSave = () => {
     if (selectedEvent) {
-      // Отримуємо поточну дату
       const today = new Date();
 
-      // Отримуємо відповідний день тижня (припускаємо, що selectedDay вже містить день українською)
       const dayMapping = {
         Неділя: 0,
         Понеділок: 1,
@@ -98,7 +67,7 @@ const CalendarModal = ({
       };
 
       const selectedWeekday = dayMapping[selectedDay];
-      if (selectedWeekday === undefined) return; // Якщо день не знайдено — вийти
+      if (selectedWeekday === undefined) return;
 
       // Знайдемо найближчу дату, яка відповідає вибраному дню тижня
       const daysUntilEvent = (selectedWeekday - today.getDay() + 7) % 7;
@@ -136,24 +105,25 @@ const CalendarModal = ({
           <div className="flex flex-col gap-[16px]">
             <h3 className="text-center text-[24px]">Деталі заняття</h3>
             <div>
-              <h4 className="text-[18px]">
+              <h4 className="text-[18px] font-bold">
                 Назва групи:{" "}
-                <span className="text-violet-800 font-bold">
-                  {lesson?.name}
-                </span>
+                <span className="text-violet-800 ">{currentGroup?.name}</span>
+              </h4>
+              <h4>
+                <span className="font-bold">Викладач:</span>{" "}
+                {currentGroup?.teacher.firstName}{" "}
+                {currentGroup?.teacher.lastName}
               </h4>
               <p className="text-gray-500">
-                Рівень: {lesson?.languageLevel.name}
+                <span className="font-bold">Рівень:</span>{" "}
+                {currentGroup?.languageLevel.name}
               </p>
 
               <div className="flex justify-between">
                 <p>
-                  Час уроку: {getWeekday(selectedEvent?._instance?.range.start)}
-                  ,{" "}
-                  {getTimeSlot(
-                    selectedEvent?._instance?.range.start,
-                    selectedEvent?._instance?.range.end
-                  )}
+                  <span className="font-bold">Час уроку:</span>{" "}
+                  {getWeekday(selectedEvent?.start)},{" "}
+                  {getTimeSlot(selectedEvent?.start)}
                 </p>
                 <button
                   onClick={() => {
@@ -204,14 +174,18 @@ const CalendarModal = ({
                 Учасники
               </h4>
               <ul className="flex flex-col gap-[8px]">
-                {lesson?.students.map((student) => (
-                  <li key={student.id} className="">
-                    <p>
-                      {student.firstName} {student.lastName}
-                    </p>
-                    <span className="block h-[1px] bg-gray-300" />
-                  </li>
-                ))}
+                {students.length > 0 ? (
+                  students?.map((student) => (
+                    <li key={student.id} className="">
+                      <p>
+                        {student.firstName} {student.lastName}
+                      </p>
+                      <span className="block h-[1px] bg-gray-300" />
+                    </li>
+                  ))
+                ) : (
+                  <p>В цій группі поки немає студентів</p>
+                )}
               </ul>
             </div>
 
@@ -223,7 +197,9 @@ const CalendarModal = ({
                 Відхилити
               </button>
               <button
-                onClick={handleSave}
+                onClick={() => {
+                  handleSave(selectedEvent?.start);
+                }}
                 className="px-[12px] py-[8px] bg-emerald-500 text-white rounded-md"
               >
                 Зберегти
