@@ -5,61 +5,27 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 import CalendarModal from "../CalendarModal/CalendarModal";
-import { API_ROUTES } from "../../shared/api/api-routes";
-import api from "../../api/api";
 
 import "../Calendar/Calendar.css";
 
-import schedule from "./groups.json";
-
-const Calendar = () => {
+const Calendar = (events) => {
   const [openModal, setOpenModal] = useState(false);
-  const [groups, setGroups] = useState([]);
-  const [students, setStudents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [currentLesson, setCurrentLesson] = useState(null);
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: studentsData } = await api.get(API_ROUTES.students);
-      setStudents(studentsData);
-      const { data } = await api.get(API_ROUTES.groups.base);
-      setGroups(data);
-      console.log(studentsData, data);
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const calendarEvents = schedule.flatMap((group) =>
-      group.schedule.map((schedule) => ({
-        title: group.name,
-        start: schedule.date,
-        id: group.id,
-      }))
-    );
-    setEvents(calendarEvents);
-  }, []);
 
   const handleEventClick = (clickInfo) => {
-    const localTime = new Date(clickInfo.event.start).toLocaleString();
-    console.log("Локальний час:", localTime);
-    setSelectedEvent(clickInfo.event);
-    const lesson = schedule.find(
-      (group) => group.id == clickInfo.event?._def.publicId
+    const newSelectedEvent = events?.events.find(
+      (event) => event.id == clickInfo.event?._def.publicId
     );
-    setCurrentLesson(lesson);
+    setSelectedEvent(newSelectedEvent);
     setOpenModal(true);
-    console.log(lesson);
   };
 
   const handleSaveEvent = (updatedEvent) => {
-    // Оновлення івенту в стані events
+    // Put/patch request
     const updatedEvents = events.map((event) =>
       event.id === updatedEvent.id ? updatedEvent : event
     );
-    setEvents(updatedEvents);
+    events.setEvents(updatedEvents);
     setSelectedEvent(null);
   };
 
@@ -88,7 +54,6 @@ const Calendar = () => {
       />
       <CalendarModal
         selectedEvent={selectedEvent}
-        lesson={currentLesson}
         openModal={openModal}
         onClose={() => setOpenModal(false)}
         onSave={handleSaveEvent}

@@ -1,51 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { API_ROUTES } from "../../shared/api/api-routes";
-import api from "../../api/api";
 
-// const data = [
-//   {
-//     id: 1,
-//     name: "High Five",
-//     time: "10:00-11:00",
-//   },
-//   {
-//     id: 2,
-//     name: "Smart Minds",
-//     time: "12:00-13:00",
-//   },
-//   {
-//     id: 3,
-//     name: "Fluent Squad",
-//     time: "14:00-15:00",
-//   },
-//   {
-//     id: 4,
-//     name: "Lingo Masters",
-//     time: "16:00-17:00",
-//   },
-// ];
-
-const TodayEventsList = () => {
+const TodayEventsList = ({ events }) => {
+  const [todayEvents, setTodayEvents] = useState([]);
   const date = new Date();
   const [day, month, year] = [
     date.getDate(),
     date.getMonth() + 1,
     date.getFullYear(),
   ].map((num) => num.toString().padStart(2, "0"));
-
-  const [groups, setGroups] = useState([]);
+  const todayStr = `${year}-${month}-${day}`;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await api.get(API_ROUTES.groups.base);
-        setGroups(data);
-        console.log(data);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    fetchData();
+    const filteredEvents = events.filter((event) => {
+      const inputDateStr = event.start.split("T")[0];
+      return inputDateStr === todayStr;
+    });
+    setTodayEvents(filteredEvents);
   }, []);
 
   return (
@@ -55,10 +25,10 @@ const TodayEventsList = () => {
         <p>{`${day}-${month}-${year}`}</p>
       </div>
       <ul className="flex flex-col gap-3 w-[432px] p-[24px] bg-white rounded-xl">
-        {groups.map((group) => (
-          <li key={group.id} className="flex justify-between">
-            <p className="font-bold">{group.name}</p>
-            <p>{group.teacher.firstName}</p>
+        {todayEvents.slice(0, 5).map((event) => (
+          <li key={event.id} className="flex justify-between">
+            <p className="font-bold">{event.title}</p>
+            <p>{event.start.split("T")[1].slice(0, 5)}</p>
           </li>
         ))}
       </ul>

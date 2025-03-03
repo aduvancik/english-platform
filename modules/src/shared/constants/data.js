@@ -18,3 +18,31 @@ export const hours = {
   "19:00": "19:00 - 20:00",
   "20:00": "20:00 - 21:00",
 };
+
+export const daysOfWeek = [
+  "Понеділок",
+  "Вівторок",
+  "Середа",
+  "Четвер",
+  "П'ятниця",
+  "Субота",
+];
+
+export const daysOfWeekInEnglish = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+export const timeSlots = [
+  "12:00-13:00",
+  "13:00-14:00",
+  "14:00-15:00",
+  "15:00-16:00",
+  "16:00-17:00",
+  "17:00-18:00",
+];
