@@ -77,8 +77,8 @@ export const ProfilePage = () => {
                 console.error('Invalid token:', decodedToken);
             }
 
-            if (userId) {
-                axios.get(`http://localhost:4000/students/${userId}`, {
+            if (userId && decodedToken.role === "student") {
+                axios.get(`http://localhost:4000${API_ROUTES.students}/${userId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -87,34 +87,75 @@ export const ProfilePage = () => {
                         const mockBackendData = response.data;
                         console.log("mockBackendData", mockBackendData);
 
-                        if (decodedToken.role === "student") {
-                            // Якщо роль студент: обробка даних для студента
-                            setFormData(prevData => ({
-                                ...prevData,
-                                ...Object.keys(mockBackendData).reduce((acc, key) => {
-                                    if (mockBackendData[key] !== undefined) {
-                                        if (key === "timeSlots") {
-                                            // Якщо це timeSlots, беремо тільки id з кожного об'єкта
-                                            acc.timeSlotIds = mockBackendData[key].map(slot => slot.id); // Зберігаємо тільки id в timeSlotIds
-                                        } else if (key === "languageLevelId") {
-                                            acc[key] = Array.isArray(mockBackendData[key])
-                                                ? mockBackendData[key]
-                                                : [mockBackendData[key]]; // Перетворюємо на масив
-                                        } else {
-                                            acc[key] = mockBackendData[key];
-                                        }
+                        // Якщо роль студент: обробка даних для студента
+                        setFormData(prevData => ({
+                            ...prevData,
+                            ...Object.keys(mockBackendData).reduce((acc, key) => {
+                                if (mockBackendData[key] !== undefined) {
+                                    if (key === "timeSlots") {
+                                        // Якщо це timeSlots, беремо тільки id з кожного об'єкта
+                                        acc.timeSlotIds = mockBackendData[key].map(slot => slot.id); // Зберігаємо тільки id в timeSlotIds
+                                    } else if (key === "languageLevelId") {
+                                        acc[key] = Array.isArray(mockBackendData[key])
+                                            ? mockBackendData[key]
+                                            : [mockBackendData[key]]; // Перетворюємо на масив
+                                    } else {
+                                        acc[key] = mockBackendData[key];
                                     }
-                                    return acc;
-                                }, {})
-                            }));
-                        } else if (decodedToken.role === "teacher") {
-                            // Якщо роль вчитель: інша логіка для вчителя
-                            setFormData(prevData => ({
-                                ...prevData,
-                                // Ти можеш додати тут інші операції для вчителя, якщо потрібно
-                                ...mockBackendData
-                            }));
-                        }
+                                }
+                                return acc;
+                            }, {})
+                        }));
+
+                        setLoading(false);  // Завантаження завершено, встановлюємо в false
+
+                    })
+                    .catch(error => {
+                        setLoading(false);  // Якщо сталася помилка, також завершуємо завантаження
+
+                    }
+                    )
+            } else if (userId && decodedToken.role === "teacher") {
+                console.log("teacher", `http://localhost:4000${API_ROUTES.teachers.base}/${userId}}`);
+
+                axios.get(`http://localhost:4000${API_ROUTES.teachers.base}/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                    .then(response => {
+                        console.log("response");
+
+                        const mockBackendData = response.data;
+                        console.log("mockBackendData", mockBackendData);
+
+                        // Якщо роль вчитель: інша логіка для вчителя
+                        setFormData(prevData => ({
+                            ...prevData,
+                            ...Object.keys(mockBackendData).reduce((acc, key) => {
+                                if (mockBackendData[key] !== undefined) {
+                                    if (key === "timeSlots") {
+                                        // Якщо це timeSlots, беремо тільки id з кожного об'єкта
+                                        acc.timeSlotIds = mockBackendData[key].map(slot => slot.id); // Зберігаємо тільки id в timeSlotIds
+                                    } else if (key === "languageLevels") {
+                                        console.log("languageLevels");
+
+                                        // Додаємо тільки id у formData.languageLevelId
+                                        acc.languageLevelId = [
+                                            ...(prevData.languageLevelId || []), // Залишаємо вже наявні дані
+                                            ...mockBackendData.languageLevels.map(level => level.id) // Додаємо нові id
+                                        ];
+
+                                        console.log("mockBackendData.languageLevels, formData.languageLevelId", mockBackendData.languageLevels, acc.languageLevelId);
+                                    }
+                                    else {
+                                        acc[key] = mockBackendData[key];
+                                    }
+                                }
+                                return acc;
+                            }, {})
+                        }));
+
                         setLoading(false);  // Завантаження завершено, встановлюємо в false
 
                     })
@@ -295,21 +336,26 @@ export const ProfilePage = () => {
         console.log(timeSlotIds);
 
         // Викликаємо функцію для оновлення студента
-        updateStudent(firstName, lastName, email, languageLevelId[0], timeSlotIds); // Використовуємо 0 індекс для `languageLevelId`
+        updateStudent(firstName, lastName, email, languageLevelId, timeSlotIds); // Використовуємо 0 індекс для `languageLevelId`
     };
 
     const updateStudent = async (firstName, lastName, email, languageLevelId, timeSlotIds) => {
-        // console.log("updatedData", updatedData);
+
+        const languageLevelIds = languageLevelId;
+        const languageLevelIdStudent = languageLevelId[0];
+        const updatedData = {
+            firstName,
+            lastName,
+            email,
+            [formData.role === "teacher" ? "languageLevelIds" : "languageLevelId"]:
+                formData.role === "student" ? languageLevelId : languageLevelIds,
+            timeSlotIds
+        };
+        console.log("updatedData", updatedData);
 
         try {
             // Створюємо об'єкт з даними для оновлення
-            const updatedData = {
-                firstName,
-                lastName,
-                email,
-                languageLevelId,
-                timeSlotIds
-            };
+
 
             console.log("updatedData", updatedData);
             console.log("lalal");
@@ -318,7 +364,12 @@ export const ProfilePage = () => {
 
             // Відправка PATCH запиту на сервер
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:4000/students/${userId}`, {
+            const url = formData.role === "teacher"
+                ? `http://localhost:4000${API_ROUTES.teachers.base}/${userId}`
+                : `http://localhost:4000${API_ROUTES.students}/${userId}`;
+
+
+            const response = await fetch(url, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -332,8 +383,7 @@ export const ProfilePage = () => {
             }
             const responseData = await response.json(); // тут може бути порожня відповідь
             console.log(responseData); // перевірка відповіді
-            const data = await response.json();
-            console.log("Student updated:", data.message);
+            console.log("Student updated:", responseData.message);
         } catch (error) {
             console.error("Помилка при оновленні студента:", error);
         }
@@ -620,7 +670,7 @@ export const ProfilePage = () => {
                             </div>
                         </div>
                     }
-                    <button type="button" onClick={handleSave}>Зберегти</button>
+                    <button type="button" onClick={handleSave} className="mx-auto mt-[44px] w-min flex justify-center align-center text-white text-[20px] bg-[#36B889] rounded-[15px] py-[10px] px-[40.5px]">Зберегти</button>
                 </div>
             )}
         </div >
