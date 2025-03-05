@@ -1,6 +1,9 @@
 // import { LabelledAddUserButton, RemoveUserButton } from "../../../shared/ui";
 // import { ModalButton } from "../../../shared/ui";
 
+import { translateTimeSlotDay } from "../../../shared/utils/translateTimeSlotDay";
+import { formatTime } from "../../../shared/utils/formatTime";
+
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 
@@ -14,41 +17,46 @@ export const StudentInfoModal = ({ openModal, handleCloseModal, student }) => {
         >
             <Box className="absolute top-[50%] left-[50%] w-[450px] max-h-[70%] -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl px-5 py-8 overflow-auto">
                 {student && (
-                    <div className="flex flex-col gap-3 text-center">
-                        <h4 className="text-[18px] font-bold">
-                            Студент {student.firstName} {student.lastName}
+                    <div>
+                        <h4 className="text-[20px] font-[600] text-center pb-5">
+                            {student.firstName} {student.lastName}
                         </h4>
-                        <p>
-                            <span className="font-bold">Email:</span> {student.email}
-                        </p>
-                        <p>
-                            <span className="font-bold">Рівень мови: </span>
-                            {student.languageLevel ? student.languageLevel.name : "-"}
-                        </p>
-                        {student.studyGroup ? (
-                            <p>
-                                <span className="font-bold">Група:</span>{" "}
-                                {student.studyGroup.name}
-                            </p>
-                        ) : (
-                            <p className="font-bold">Група відсутня</p>
-                        )}
-                        <div>
-                            {student.timeSlots ? (
-                                <div>
-                                    <span className="font-bold">Розклад:</span>
-                                    <ul>
-                                        {student.timeSlots &&
-                                            student.timeSlots.map((slot) => (
-                                                <li key={slot.id}>
-                                                    {slot.dayOfWeek}: {slot.startAt}-{slot.endAt}
-                                                </li>
+                        <div className="flex justify-center gap-[20px]">
+                            <div className="text-right flex flex-col gap-[15px]">
+                                <p>Рівень: </p>
+                                <p>Група: </p>
+                                <p>Обрані дні:</p>
+                                <p>Обрані години:</p>
+                            </div>
+                            <div className="flex flex-col gap-[15px] text-[#36B889] font-[600]">
+                                <p>{student.languageLevel ? student.languageLevel.name : "-"}</p>
+                                <p>{student.studyGroup ? student.studyGroup.name : "відсутня"}</p>
+                                <>
+                                    {student.timeSlots ? (
+                                        <>
+                                            {student.timeSlots.map((slot) => (
+                                                <span
+                                                    key={slot.id}
+                                                    className="text-[#36B889] font-[600]"
+                                                >
+                                                    {translateTimeSlotDay(slot.dayOfWeek)}
+                                                </span>
                                             ))}
-                                    </ul>
-                                </div>
-                            ) : (
-                                <p>No timeslots</p>
-                            )}
+
+                                            {student.timeSlots.map((slot) => (
+                                                <span
+                                                    key={slot.id}
+                                                    className="text-[#36B889] font-[600]"
+                                                >
+                                                    {formatTime(slot.startAt)}
+                                                </span>
+                                            ))}
+                                        </>
+                                    ) : (
+                                        <p>Немає розкладу</p>
+                                    )}
+                                </>
+                            </div>
                         </div>
                     </div>
                 )}

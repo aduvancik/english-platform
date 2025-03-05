@@ -6,7 +6,7 @@ export const GroupCard = ({ group, selectGroup, openModal, studentsAmount }) => 
     return (
         <div
             onClick={() => {
-                selectGroup(group.id);
+                selectGroup();
                 openModal();
             }}
             className="w-[325px] h-[165px] text-white rounded-xl relative flex flex-col justify-between cursor-pointer"
