@@ -8,3 +8,4 @@ export * from "./OptionButton.jsx";
 export * from "./ModalButton.jsx";
 export * from "./LogoutButton.jsx";
 export * from "./Loader.jsx";
+export * from "./TimeSlot.jsx";
