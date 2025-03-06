@@ -105,6 +105,10 @@ export const deleteStudyGroup = async (req, res, next) => {
 
 export const generateStudyGroups = async (req, res, next) => {
     try {
+        function createTimeSlotKey(timeSlotIds) {
+            return timeSlotIds.sort((a, b) => a - b).join("-");
+        }
+
         const students = await Student.findAll({
             include: [LanguageLevel,
                 {
@@ -113,6 +117,7 @@ export const generateStudyGroups = async (req, res, next) => {
                 },
             ],
         });
+
         const teachers = await Teacher.findAll({
             include: [LanguageLevel, {
                 model: TimeSlot,
@@ -120,227 +125,95 @@ export const generateStudyGroups = async (req, res, next) => {
             }],
         });
 
-        await StudyGroup.destroy({ where: {} });
-
-        const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-        function sortHelperTimeSlots(a, b) {
-            const timeComparison = a.startAt.localeCompare(b.startAt);
-            if (timeComparison !== 0) {
-                return timeComparison;
-            }
-
-            return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
-        }
-
-        let count = 0;
-        for (const teacher of teachers) {
-            const teacherGroups = [];
-
-            for (const languageLevel of teacher.LanguageLevels) {
-                const group = await StudyGroup.create({
-                    name: `Group ${count++}`,
-                    teacherId: teacher.id,
-                    languageLevelId: languageLevel.id,
-                });
-                teacherGroups.push(group);
-            }
-
-            const teacherTimeSlots = teacher.TimeSlots.sort(sortHelperTimeSlots);
-
-            const totalSlots = teacherTimeSlots.length;
-            const totalTeacherGroups = teacherGroups.length;
-
-            for (let i = 0; i < totalSlots; ++i) {
-                const groupIndex = i % totalTeacherGroups;
-                await teacherGroups[groupIndex].addTimeSlots([teacherTimeSlots[i].id]);
-            }
-        }
-
-        const groups = await StudyGroup.findAll({
-            include: [LanguageLevel, TimeSlot],
-        });
-        let candidateGroups = [];
-
+        const studentGroups = {};
         for (const student of students) {
-            function isSubset(group) {
-                const studentTimeSlotIds = student.TimeSlots.map(slot => slot.id);
-                const groupTimeSlotIds = group.TimeSlots.map(slot => slot.id);
+            const studentSlotIds = student.TimeSlots.map(ts => ts.id);
+            const key = createTimeSlotKey(studentSlotIds);
+            const langLevelId = student.languageLevelId;
 
-                return studentTimeSlotIds.every(slot => groupTimeSlotIds.includes(slot));
+            if (!studentGroups[langLevelId]) {
+                studentGroups[langLevelId] = {};
             }
 
-            candidateGroups = groups
-                .filter(group => group.languageLevelId === student.languageLevelId)
-                .filter(isSubset);
-
-            if (candidateGroups.length === 0) {
-                continue;
+            if (!studentGroups[langLevelId][key]) {
+                studentGroups[langLevelId][key] = [];
             }
 
-            let finalGroup = candidateGroups[0];
-            for (const group of candidateGroups) {
-                const groupStudentCount = await Student.count({
-                    where: {
-                        studyGroupId: group.id,
-                    },
-                });
-                const finalGroupStudentCount = await Student.count({
-                    where: {
-                        studyGroupId: finalGroup.id,
-                    },
-                });
-
-                if (groupStudentCount < 3) {
-                    finalGroup = group;
-                    break;
-                }
-
-                if (groupStudentCount < finalGroupStudentCount) {
-                    finalGroup = group;
-                }
-            }
-
-            await student.update({ studyGroupId: finalGroup.id });
+            studentGroups[langLevelId][key].push(student);
         }
 
-        // Divide groups into smaller ones
-        const maxGroupSize = 7;
+        const teacherGroups = {};
+        for (const teacher of teachers) {
+            const teacherSlotIds = teacher.TimeSlots.map(ts => ts.id);
+            const key = createTimeSlotKey(teacherSlotIds);
 
-        for (const group of groups) {
-            const studentGroupCount = await Student.count({
-                where: { studyGroupId: group.id },
-            });
-
-            if (studentGroupCount < 8) {
-                continue;
-            }
-
-            const newSubGroups = [];
-            const totalSubGroups = Math.ceil(studentGroupCount / maxGroupSize);
-
-            for (let i = 0; i < totalSubGroups; ++i) {
-                const subGroup = await StudyGroup.create({
-                    name: `${group.name} - Subgroup ${i + 1}`,
-                    teacherId: group.teacherId,
-                    languageLevelId: group.languageLevelId,
-                });
-                newSubGroups.push(subGroup);
-            }
-
-            const studyGroupTimeSlots = group.TimeSlots.sort(sortHelperTimeSlots);
-            const totalSlots = studyGroupTimeSlots.length;
-
-            for (let i = 0; i < totalSlots; ++i) {
-                const subGroupIndex = i % totalSubGroups;
-                await newSubGroups[subGroupIndex].addTimeSlots([studyGroupTimeSlots[i].id]);
-            }
-
-            const students = await Student.findAll({
-                where: {
-                    studyGroupId: group.id,
-                },
-                include: [TimeSlot],
-            });
-
-            for (const student of students) {
-                for (let i = 0; i < newSubGroups.length; ++i) {
-                    const subGroup = await StudyGroup.findByPk(newSubGroups[i].id, {
-                        include: [TimeSlot],
-                    });
-
-                    const studentSubGroupCount = await Student.count({
-                        where: { studyGroupId: subGroup.id },
-                    });
-
-                    const studentTimeSlotIds = student.TimeSlots.map(slot => slot.id);
-                    const subGroupTimeSlotIds = subGroup.TimeSlots.map(slot => slot.id);
-
-                    const isSubset = studentTimeSlotIds.every(slot => subGroupTimeSlotIds.includes(slot));
-
-                    if (isSubset && studentSubGroupCount < maxGroupSize) {
-                        await student.update({ studyGroupId: subGroup.id });
-                    }
+            for (const langLevelObj of teacher.LanguageLevels) {
+                const langLevelId = langLevelObj.id;
+                if (!teacherGroups[langLevelId]) {
+                    teacherGroups[langLevelId] = {};
                 }
-            }
 
-            await group.destroy();
-        }
-
-        return res.status(200).json({ message: "Study groups generated" });
-    } catch (er) {
-        next(er);
-    }
-};
-
-export const generateStudyGroupsV2 = async (req, res, next) => {
-    try {
-        const students = await Student.findAll({
-            include: [LanguageLevel,
-                {
-                    model: TimeSlot,
-                    through: { attributes: [] },
-                },
-            ],
-        });
-
-        const teachers = await Teacher.findAll({
-            include: [LanguageLevel, {
-                model: TimeSlot,
-                through: { attributes: [] },
-            }],
-        });
-
-        const timeSlots = await TimeSlot.findAll();
-
-        let timeSlotGroups = { };
-
-        for (const timeSlot of timeSlots) {
-            timeSlotGroups[timeSlot.id] = {};
-            for (let languageLevelId = 1; languageLevelId < 7; ++languageLevelId) {
-                timeSlotGroups[timeSlot.id][languageLevelId] = { students: [], isTaken: false };
-            }
-        }
-
-        for (const groupTimeSlotId of Object.keys(timeSlotGroups)) {
-            for (const groupLanguageLevelId of Object.keys(timeSlotGroups[groupTimeSlotId])) {
-                for (const student of students) {
-                    for (const studentTimeSlot of student.TimeSlots) {
-                        if (studentTimeSlot.id === parseInt(groupTimeSlotId)
-                            && student.languageLevelId === parseInt(groupLanguageLevelId)) {
-                            timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].students.push(student);
-                        }
-                    }
+                if (!teacherGroups[langLevelId][key]) {
+                    teacherGroups[langLevelId][key] = [];
                 }
-            }
+
+                teacherGroups[langLevelId][key].push(teacher);
+            };
         }
 
-        let count = 0;
+        const teacherLoad = new Map();
+        for (const teacher of teachers) {
+            teacherLoad.set(teacher.id, 0);
+        }
+
         await StudyGroup.destroy({ where: {} });
 
-        for (const groupTimeSlotId of Object.keys(timeSlotGroups)) {
-            for (const groupLanguageLevelId of Object.keys(timeSlotGroups[groupTimeSlotId])) {
-                for (const teacher of teachers) {
-                    for (const teacherTimeSlot of teacher.TimeSlots) {
-                        for (const teacherLanguageLevel of teacher.LanguageLevels) {
-                            if (!timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].isTaken
-                                && teacherTimeSlot.id === parseInt(groupTimeSlotId)
-                                && teacherLanguageLevel.id === parseInt(groupLanguageLevelId)
-                                && timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].students.length !== 0) {
-                                const group = await StudyGroup.create({
-                                    name: `Group ${++count}`,
-                                    teacherId: teacher.id,
-                                    languageLevelId: teacherLanguageLevel.id,
-                                });
-                                await group.addTimeSlots([teacherTimeSlot.id]);
-                                for (const student of timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].students) {
-                                    await student.update({ studyGroupId: group.id });
-                                }
-                                timeSlotGroups[groupTimeSlotId][groupLanguageLevelId].isTaken = true;
-                            }
-                        }
+        let count = 0;
+
+        for (const [langLevelKey, groupsByKey] of Object.entries(studentGroups)) {
+            const langLevelId = parseInt(langLevelKey);
+            for (const [studentTimeSlotKey, studentsArray] of Object.entries(groupsByKey)) {
+                if (studentsArray.length === 0) continue;
+
+                const studentTimeSlotIds = studentTimeSlotKey.split("-").map(slot => parseInt(slot));
+                const teacherGroup = teacherGroups[langLevelId] || {};
+                let eligibleTeachers = [];
+
+                for (const [key, teachers] of Object.entries(teacherGroup)) {
+                    const teacherTimeSlotIds = key.split("-").map(slot => parseInt(slot));
+                    if (studentTimeSlotIds.every(slotId => teacherTimeSlotIds.includes(slotId))) {
+                        eligibleTeachers = teachers;
                     }
                 }
+
+                if (eligibleTeachers.length === 0) continue;
+
+                let selectedTeacher = eligibleTeachers[0];
+                let minLoad = teacherLoad.get(selectedTeacher.id);
+
+                for (const teacher of eligibleTeachers) {
+                    const load = teacherLoad.get(teacher.id);
+                    if (load < minLoad) {
+                        minLoad = load;
+                        selectedTeacher = teacher;
+                    }
+                }
+
+                teacherLoad.set(selectedTeacher.id, teacherLoad.get(selectedTeacher.id) + 1);
+
+                const group = await StudyGroup.create({
+                    name: `Group ${++count}`,
+                    teacherId: selectedTeacher.id,
+                    languageLevelId: langLevelId,
+                });
+
+                await group.addTimeSlots(studentTimeSlotIds);
+
+                const studentIds = studentsArray.map(s => s.id);
+                await Student.update(
+                    { studyGroupId: group.id },
+                    { where: { id: studentIds } },
+                );
             }
         }
 
