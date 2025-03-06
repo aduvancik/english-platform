@@ -2,6 +2,10 @@
 
 <p>Online platform of English language courses</a></p>
 
+<h2>Project Screenshots:</h2>
+
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/login_eng.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/register_eng.png)
 
 <h2>🛠️ Installation Steps:</h2>
 
