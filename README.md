@@ -6,6 +6,11 @@
 
 ![screenshot](https://github.com/aduvancik/aduvancik/blob/main/login_eng.png)
 ![screenshot](https://github.com/aduvancik/aduvancik/blob/main/register-eng.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/profile-eng.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/groops-1.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/groops-2.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/calendar-1.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/calendar-2.png)
 
 <h2>🛠️ Installation Steps:</h2>
 
