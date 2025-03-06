@@ -5,7 +5,7 @@
 <h2>Project Screenshots:</h2>
 
 ![screenshot](https://github.com/aduvancik/aduvancik/blob/main/login_eng.png)
-![screenshot](https://github.com/aduvancik/aduvancik/blob/main/register_eng.png)
+![screenshot](https://github.com/aduvancik/aduvancik/blob/main/register-eng.png)
 
 <h2>🛠️ Installation Steps:</h2>
 
