@@ -5,7 +5,7 @@ import { readFile } from "node:fs/promises";
 
 const dataStudents = JSON.parse(await readFile("dataStudents.json"));
 const dataTeachers = JSON.parse(await readFile("dataTeachers.json"));
-const dataStudentTimeSlots = JSON.parse(await readFile("dataStudentTimeSlots.json"));
+const dataStudentTimeSlots = JSON.parse(await readFile("dataStudentTimeSlots2.json"));
 
 export async function seedDatabase() {
     try {
